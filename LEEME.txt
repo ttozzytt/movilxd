@@ -1,0 +1,38 @@
+OSCAR CALLE · MI ESPACIO (PWA)
+
+DISEÑO
+- La aplicación está dividida en pantallas independientes: Inicio, Sobre mí, Mi rutina, Favoritos y Formulario.
+- No tiene carrusel de fotografías ni una página larga con scroll. La navegación cambia de pantalla.
+- En PC usa menú lateral; en móvil usa menú y barra inferior.
+- Se adapta a distintos tamaños de pantalla.
+
+ARCHIVOS
+- index.html: estructura y pantallas.
+- styles.css: diseño visual adaptable.
+- app.js: navegación, filtro, búsquedas, validaciones e instalación.
+- vendor/jquery-3.6.0.min.js: jQuery local.
+- manifest.webmanifest: configuración de instalación PWA.
+- sw.js: caché para modo sin conexión.
+- icons/: iconos de la aplicación.
+- README.md: instrucciones para probar localmente y publicar más adelante con GitHub Pages.
+
+PROBAR LOCALMENTE
+1. Descomprime la carpeta completa.
+2. Abre la carpeta oscar-pwa en Visual Studio Code.
+3. Inicia Live Server desde index.html.
+4. Abre la dirección local que muestra Live Server.
+5. Para revisar la PWA: F12 > Application > Manifest y Service Workers.
+6. Para probar el modo sin conexión: carga primero la aplicación, activa Offline en DevTools y recarga.
+
+VALIDACIONES
+- Nombre: obligatorio, mínimo 3 caracteres y formato válido.
+- Correo: formato válido.
+- Celular: 8 dígitos.
+- Fecha: obligatoria y no futura.
+- Contraseña: mínimo 8 caracteres, con mayúscula, minúscula y número.
+- Confirmación: debe coincidir.
+- Mensaje: entre 10 y 200 caracteres.
+- Términos: aceptación obligatoria.
+
+IMPORTANTE
+El formulario solo valida localmente. No envía datos a un servidor ni guarda contraseñas. La PWA puede funcionar sin conexión después de la primera carga.
