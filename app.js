@@ -34,27 +34,49 @@ function showView(name) {
   history.replaceState(null, '', `#${name}`);
 }
 
-// Navegación y menú hamburguesa con jQuery, siguiendo el ejemplo de clase.
-$(() => {
-  $('[data-view]').on('click', function () {
+// Navegación con delegación de eventos. Se limpia el listener anterior antes de asignarlo.
+$(document).ready(function () {
+  $(document).off('click', '[data-view]');
+  $(document).on('click', '[data-view]', function () {
     showView(this.dataset.view);
     closeMobileMenu();
   });
-  $('[data-go]').on('click', function () { showView(this.dataset.go); });
-  // Menú hamburguesa desplegable con el efecto slideToggle de clase.
-  $('#mobileMenuToggle').on('click', function () {
-    const $menu = $('#mobileMenu');
-    const opening = !$menu.is(':visible');
-    $menu.stop(true, true).slideToggle(300);
-    $(this).attr({
-      'aria-expanded': String(opening),
-      'aria-label': opening ? 'Cerrar menú' : 'Abrir menú'
-    }).text(opening ? '×' : '☰');
+
+  $(document).off('click', '[data-go]');
+  $(document).on('click', '[data-go]', function () {
+    showView(this.dataset.go);
   });
+
+  // Simulación de hidratación: conecta el botón estático con su evento jQuery.
+  // Se ejecuta una sola vez y verifica data-hidratado para evitar eventos duplicados.
+  function hidratarInterfaz() {
+    const $box = $('#contenedorMenu');
+    if (!$box.length || $box.attr('data-hidratado') === 'true') return;
+
+    $('#btnPWA')
+      .prop('disabled', false)
+      .text('☰ Menú Interactivo (Hidratado)')
+      .off('click')
+      .on('click', function () {
+        const $menu = $('#mobileMenu');
+        const opening = !$menu.is(':visible');
+        $menu.stop(true, true).slideToggle(300);
+        $(this).attr({
+          'aria-expanded': String(opening),
+          'aria-label': opening ? 'Cerrar menú' : 'Abrir menú'
+        });
+      });
+
+    $box.attr('data-hidratado', 'true');
+  }
+
+  // La interfaz se muestra primero estática y se hidrata 500 ms después.
+  setTimeout(hidratarInterfaz, 500);
 });
+
 function closeMobileMenu() {
   $('#mobileMenu').stop(true, true).slideUp(300);
-  $('#mobileMenuToggle').attr({ 'aria-expanded': 'false', 'aria-label': 'Abrir menú' }).text('☰');
+  $('#btnPWA').attr({ 'aria-expanded': 'false', 'aria-label': 'Abrir menú' });
 }
 const firstView = location.hash.replace('#', '');
 showView(views.includes(firstView) ? firstView : 'inicio');
@@ -67,7 +89,7 @@ const modulesByArea = {
 const areaSelect = document.getElementById('areaSelect');
 const moduleSelect = document.getElementById('moduleSelect');
 const layerResult = document.getElementById('layerResult');
-$('#areaSelect').on('change', function () {
+$('#areaSelect').off('change.filtro').on('change.filtro', function () {
   const selectedArea = $(this).val();
   $('#moduleSelect').empty().append(new Option('Selecciona un módulo', ''));
   const modules = modulesByArea[selectedArea] || [];
@@ -75,7 +97,7 @@ $('#areaSelect').on('change', function () {
   $('#moduleSelect').prop('disabled', modules.length === 0);
   $('#layerResult').html('<span class="result-icon">✦</span><div><small>RESULTADO</small><strong>Esperando selección</strong><p>Elige un módulo para ver el elemento.</p></div>');
 });
-$('#moduleSelect').on('change', function () {
+$('#moduleSelect').off('change.filtro').on('change.filtro', function () {
   const selected = (modulesByArea[$('#areaSelect').val()] || []).find(module => module.value === $(this).val());
   if (!selected) {
     $('#layerResult').html('<span class="result-icon">✦</span><div><small>RESULTADO</small><strong>Esperando selección</strong><p>El resultado aparecerá aquí.</p></div>');
@@ -111,14 +133,15 @@ const artistsByGenre = {
 const genreSelect = document.getElementById('genreSelect');
 const artistSelect = document.getElementById('artistSelect');
 const artistResult = document.getElementById('artistResult');
-genreSelect.addEventListener('change', () => {
+$('#genreSelect').off('change.genero').on('change.genero', function () {
   artistSelect.innerHTML = '<option value="">Selecciona un artista</option>';
-  (artistsByGenre[genreSelect.value] || []).forEach(artist => artistSelect.add(new Option(artist, artist)));
-  artistSelect.disabled = !genreSelect.value;
-  artistResult.textContent = genreSelect.value ? 'Ahora selecciona un artista.' : 'Selecciona un género para continuar.';
+  (artistsByGenre[this.value] || []).forEach(artist => artistSelect.add(new Option(artist, artist)));
+  artistSelect.disabled = !this.value;
+  artistResult.textContent = this.value ? 'Ahora selecciona un artista.' : 'Selecciona un género para continuar.';
 });
-artistSelect.addEventListener('change', () => {
-  artistResult.textContent = artistSelect.value ? `Tu selección: ${artistSelect.value}` : 'Selecciona un artista.';
+
+$('#artistSelect').off('change.genero').on('change.genero', function () {
+  artistResult.textContent = this.value ? `Tu selección: ${this.value}` : 'Selecciona un artista.';
 });
 
 // Validación del formulario: errores por campo, validación al salir/editar y confirmación local.
@@ -179,18 +202,27 @@ function validateField(id) {
   return !error;
 }
 fieldIds.forEach(id => {
-  const element = document.getElementById(id);
+  const $element = $(`#${id}`);
   const eventName = id === 'terms' ? 'change' : 'blur';
-  element.addEventListener(eventName, () => validateField(id));
-  if (id !== 'terms') element.addEventListener('input', () => {
-    if (element.closest('.form-field').classList.contains('invalid')) validateField(id);
-    if (id === 'password' && document.getElementById('confirmPassword').value) validateField('confirmPassword');
-  });
+
+  // Limpia eventos de validación anteriores antes de volver a registrarlos.
+  $element.off('.validacion');
+  $element.on(`${eventName}.validacion`, () => validateField(id));
+
+  if (id !== 'terms') {
+    $element.on('input.validacion', () => {
+      if ($element.closest('.form-field').hasClass('invalid')) validateField(id);
+      if (id === 'password' && $('#confirmPassword').val()) validateField('confirmPassword');
+    });
+  }
 });
-document.getElementById('message').addEventListener('input', event => {
-  document.getElementById('charCount').textContent = `${event.target.value.length} / 200`;
+
+$('#message').off('input.contador').on('input.contador', function () {
+  $('#charCount').text(`${this.value.length} / 200`);
 });
-$(form).on('submit', event => {
+
+// El formulario también limpia el evento submit previo para evitar duplicaciones.
+$(form).off('submit.validacion').on('submit.validacion', event => {
   event.preventDefault();
   const checks = fieldIds.map(validateField);
   const firstInvalid = fieldIds.find((id, index) => !checks[index]);

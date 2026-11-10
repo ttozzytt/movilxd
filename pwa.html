@@ -31,10 +31,13 @@
 <div class="app-column">
 <header class="topbar">
 <div class="mobile-brand"><span class="brand-mark small">OC</span><strong>OSCAR CALLE</strong></div>
-<div class="breadcrumb"><span>MI ESPACIO</span><b>/</b><strong id="pageName">Inicio</strong></div>
+<div class="breadcrumb"><a class="breadcrumb-home" href="index.html" title="Volver a la portada con mis fotos">MI ESPACIO</a><b>/</b><strong id="pageName">Inicio</strong></div>
 <div class="top-actions">
 <span class="live-label"><i></i> PORTAFOLIO PERSONAL</span>
-<button aria-expanded="false" aria-label="Abrir menú" class="mobile-menu-toggle" id="mobileMenuToggle" type="button">☰</button>
+<!-- Menú estático inicial: JavaScript lo hidrata después de cargar la página. -->
+<div id="contenedorMenu" data-hidratado="false">
+<button aria-expanded="false" aria-label="Menú en preparación" class="mobile-menu-toggle btn-estatico" disabled id="btnPWA" type="button">Cargando Menú...</button>
+</div>
 </div>
 </header>
 <nav aria-label="Menú desplegable" class="mobile-menu" id="mobileMenu">
@@ -58,10 +61,10 @@
 <button class="text-btn" data-go="favoritos">Mis gustos <span>→</span></button>
 </div>
 </div>
-<div aria-label="Fotografía personal de Oscar" class="hero-art hero-photo">
-<img alt="Oscar en una selfie frente al espejo" src="imagenes/selfie-espejo.webp"/>
-<span class="photo-stamp">OC · 22</span>
-</div>
+<figure aria-label="Fotografía personal de Oscar" class="home-feature-photo">
+<img alt="Oscar en una selfie frente al espejo" src="imagenes/selfie-espejo.webp" loading="eager" fetchpriority="high"/>
+<figcaption><span>OC · 22</span><strong>Un poco de mí</strong></figcaption>
+</figure>
 </div>
 <div class="section-heading"><div><span class="eyebrow">RESUMEN</span><h2>Cosas que me representan</h2></div><span class="muted-note">Mira un poco más</span></div>
 <div class="summary-grid">
