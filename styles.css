@@ -1024,3 +1024,74 @@ a.breadcrumb-home { display:inline-flex; align-items:center; text-decoration:non
 /* La foto principal siempre debe ser visible; evita que reglas antiguas la oculten. */
 .home-feature-photo { display:block !important; visibility:visible !important; opacity:1 !important; }
 .home-feature-photo img { display:block !important; visibility:visible !important; opacity:1 !important; }
+
+
+/* ===== Boton visible para demostrar la hidratacion (PC y celular) ===== */
+.app-column { position: relative; }
+#contenedorMenu { display: block; flex: 0 0 auto; }
+.mobile-menu-toggle {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  min-width: 218px;
+  height: 38px;
+  padding: 0 13px;
+  border: 1px solid rgba(255,155,91,.48);
+  border-radius: 9px;
+  background: rgba(255,139,69,.10);
+  color: #ffb47b;
+  font: 700 10px 'Segoe UI', system-ui, sans-serif;
+  letter-spacing: .25px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background .2s, border-color .2s, transform .2s;
+}
+.mobile-menu-toggle:hover:not(:disabled) {
+  background: rgba(255,139,69,.19);
+  border-color: #ff9a58;
+  transform: translateY(-1px);
+}
+.mobile-menu-toggle:disabled {
+  opacity: .72;
+  cursor: wait;
+}
+/* El menu desplegable también se puede probar en la vista de computadora. */
+#mobileMenu {
+  display: none;
+  position: absolute;
+  top: 64px;
+  right: 28px;
+  z-index: 100;
+  width: 225px;
+  padding: 7px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #1d2a35;
+  box-shadow: var(--shadow);
+}
+#mobileMenu button {
+  display: block;
+  width: 100%;
+  padding: 11px 12px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #c4d0d6;
+  text-align: left;
+  font-size: 13px;
+  cursor: pointer;
+}
+#mobileMenu button span { margin-left: 9px; font-size: 11px; }
+#mobileMenu button:hover { background: rgba(255,139,69,.1); color: var(--orange2); }
+@media (max-width: 760px) {
+  .mobile-menu-toggle {
+    min-width: 0;
+    max-width: 180px;
+    height: 34px;
+    padding: 0 9px;
+    font-size: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  #mobileMenu { top: 58px; right: 12px; width: 205px; }
+}
