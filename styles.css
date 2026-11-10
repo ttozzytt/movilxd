@@ -930,14 +930,21 @@ body.viewer-open { overflow:hidden; }
 
 /* Corrección de portada: foto personal siempre visible y acceso real a la portada. */
 .breadcrumb-home {
-  display:inline-block;
+  display:inline-flex;
+  align-items:center;
+  padding:5px 8px;
   color:var(--orange2);
-  text-decoration:none;
-  border-bottom:1px dotted rgba(255,177,120,.45);
+  font:inherit;
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:1.4px;
+  background:rgba(255,139,69,.07);
+  border:1px solid rgba(255,177,120,.28);
+  border-radius:7px;
   cursor:pointer;
-  transition:color .2s,border-color .2s;
+  transition:color .2s,background .2s,border-color .2s;
 }
-.breadcrumb-home:hover { color:#fff; border-color:var(--orange); }
+.breadcrumb-home:hover { color:#fff; background:rgba(255,139,69,.16); border-color:var(--orange); }
 .home-feature-photo {
   display:block !important;
   position:relative;
