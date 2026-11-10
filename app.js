@@ -10,7 +10,7 @@ function showView(name) {
   const currentView = document.querySelector('.view.active');
   const currentName = currentView ? currentView.id.replace('view-', '') : '';
 
-  // Las pantallas avanzan entrando desde la derecha y retroceden desde la izquierda.
+  // Cambio de pantallas: al avanzar entra desde la derecha; al retroceder, desde la izquierda.
   if (currentName !== name) {
     document.querySelectorAll('.view').forEach(view => {
       view.classList.remove('active', 'slide-from-left', 'slide-from-right');
@@ -34,7 +34,7 @@ function showView(name) {
   history.replaceState(null, '', `#${name}`);
 }
 
-// Navegación y menú hamburguesa con jQuery, siguiendo la guía de clase.
+// Navegación y menú hamburguesa con jQuery, siguiendo el ejemplo de clase.
 $(() => {
   $('[data-view]').on('click', function () {
     showView(this.dataset.view);
@@ -215,31 +215,4 @@ function showToast(message) {
   toast.classList.add('show');
   window.clearTimeout(showToast.timer);
   showToast.timer = window.setTimeout(() => toast.classList.remove('show'), 2800);
-}
-
-// Instalación PWA.
-let installPrompt = null;
-const installBtn = document.getElementById('installBtn');
-window.addEventListener('beforeinstallprompt', event => {
-  event.preventDefault();
-  installPrompt = event;
-  installBtn.hidden = false;
-});
-installBtn.addEventListener('click', async () => {
-  if (!installPrompt) {
-    showToast('En Chrome/Edge: abre el menú del navegador y elige “Instalar aplicación”.');
-    return;
-  }
-  installPrompt.prompt();
-  await installPrompt.userChoice;
-  installPrompt = null;
-});
-window.addEventListener('appinstalled', () => {
-  installBtn.textContent = '✓ Aplicación instalada';
-  installBtn.disabled = true;
-  showToast('La aplicación quedó instalada.');
-});
-
-if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => showToast('No se pudo activar el modo sin conexión.')));
 }

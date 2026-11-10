@@ -2,222 +2,26 @@
 <html lang="es">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#111820">
-  <meta name="description" content="Portafolio personal de Oscar Calle en formato aplicación web progresiva.">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>Oscar Calle · Mi espacio</title>
-  <link rel="manifest" href="manifest.webmanifest">
-  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Presentación personal de Oscar Calle.">
+  <title>Oscar Calle · Inicio</title>
   <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-  <div class="app-shell">
-    <aside class="sidebar" aria-label="Navegación principal">
-      <a class="brand" href="#inicio" data-view="inicio" aria-label="Ir al inicio">
-        <span class="brand-mark">OC</span>
-        <span><strong>OSCAR CALLE</strong><small>ESPACIO PERSONAL</small></span>
-      </a>
-      <div class="side-caption">MENÚ</div>
-      <nav class="nav-list">
-        <button class="nav-item active" data-view="inicio"><span class="nav-icon">⌂</span>Inicio</button>
-        <button class="nav-item" data-view="perfil"><span class="nav-icon">◉</span>Sobre mí</button>
-        <button class="nav-item" data-view="rutina"><span class="nav-icon">▦</span>Mi rutina</button>
-        <button class="nav-item" data-view="favoritos"><span class="nav-icon">✦</span>Favoritos</button>
-        <button class="nav-item" data-view="contacto"><span class="nav-icon">✉</span>Formulario</button>
-      </nav>
-      <div class="sidebar-bottom">
-        <div class="online-dot"></div>
-        <span>Aplicación lista</span>
-        <span class="version">PWA · 1.0</span>
+<body class="entry-body">
+  <main class="entry-page">
+    <section class="entry-card">
+      <div class="entry-brand"><span class="entry-mark">OC</span><span>OSCAR CALLE</span></div>
+      <p class="eyebrow"><span class="eyebrow-line"></span> PRESENTACIÓN PERSONAL</p>
+      <h1>Hola, soy <span>Oscar.</span></h1>
+      <p class="entry-lead">Esta es mi presentación. Aquí comparto mis pasatiempos, mi rutina, mis gustos y algunas cosas que quiero aprender.</p>
+      <div class="entry-summary">
+        <article><small>TIEMPO LIBRE</small><strong>Skate · Cerros · Futsal</strong></article>
+        <article><small>INTERESES</small><strong>Streams · Música · Videojuegos</strong></article>
+        <article><small>FRASE</small><strong>«Yo siempre gano».</strong></article>
       </div>
-    </aside>
-
-    <div class="app-column">
-      <header class="topbar">
-        <div class="mobile-brand"><span class="brand-mark small">OC</span><strong>OSCAR CALLE</strong></div>
-        <div class="breadcrumb"><span>MI ESPACIO</span><b>/</b><strong id="pageName">Inicio</strong></div>
-        <div class="top-actions">
-          <span class="live-label"><i></i> PORTAFOLIO PERSONAL</span>
-          <button class="install-btn" id="installBtn" type="button"><span>＋</span> Instalar app</button>
-          <button class="mobile-menu-toggle" id="mobileMenuToggle" type="button" aria-label="Abrir menú" aria-expanded="false">☰</button>
-        </div>
-      </header>
-      <nav class="mobile-menu" id="mobileMenu" aria-label="Menú desplegable">
-        <button data-view="inicio">⌂ <span>Inicio</span></button>
-        <button data-view="perfil">◉ <span>Sobre mí</span></button>
-        <button data-view="rutina">▦ <span>Mi rutina</span></button>
-        <button data-view="favoritos">✦ <span>Favoritos</span></button>
-        <button data-view="contacto">✉ <span>Formulario</span></button>
-      </nav>
-
-      <main class="main-content" id="mainContent">
-        <!-- INICIO -->
-        <section class="view active" id="view-inicio" aria-labelledby="homeTitle">
-          <div class="welcome-row">
-            <div>
-              <div class="eyebrow"><span class="eyebrow-line"></span> BIENVENIDO A MI ESPACIO</div>
-              <h1 id="homeTitle">Hola, soy <span>Oscar.</span></h1>
-              <p class="lead">Un poco de lo que hago, lo que me gusta y lo que quiero aprender.</p>
-              <div class="hero-actions">
-                <button class="primary-btn" data-go="perfil">Conóceme <span>↗</span></button>
-                <button class="text-btn" data-go="contacto">Ir al formulario <span>→</span></button>
-              </div>
-            </div>
-            <div class="hero-art" aria-label="Ilustración decorativa">
-              <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
-              <div class="hero-monogram">OC</div>
-              <span class="art-chip chip-top">CREATIVIDAD</span>
-              <span class="art-chip chip-bottom">DISCIPLINA · CURIOSIDAD</span>
-              <span class="art-spark spark-one">✳</span><span class="art-spark spark-two">✦</span>
-            </div>
-          </div>
-          <div class="section-heading"><div><span class="eyebrow">RESUMEN</span><h2>Mi mundo, en pocas palabras</h2></div><span class="muted-note">Explora desde el menú</span></div>
-          <div class="summary-grid">
-            <button class="summary-card" data-go="perfil"><span class="card-icon orange">↗</span><span class="card-label">TIEMPO LIBRE</span><strong>Skate · Cerros · Futsal</strong><small>Lo que disfruto hacer</small></button>
-            <button class="summary-card" data-go="favoritos"><span class="card-icon violet">♫</span><span class="card-label">MIS FAVORITOS</span><strong>Música y videojuegos</strong><small>Mis gustos personales</small></button>
-            <button class="summary-card" data-go="rutina"><span class="card-icon cyan">◷</span><span class="card-label">DÍA A DÍA</span><strong>Estudio y práctica</strong><small>Así organizo mi tiempo</small></button>
-          </div>
-          <div class="quote-strip"><span class="quote-mark">“</span><div><small>MI FRASE</small><strong>Yo siempre gano.</strong></div><span class="quote-decoration">✳</span></div>
-        </section>
-
-        <!-- PERFIL -->
-        <section class="view" id="view-perfil" aria-labelledby="profileTitle">
-          <div class="view-heading"><div><div class="eyebrow"><span class="eyebrow-line"></span> PERFIL PERSONAL</div><h1 id="profileTitle">Sobre <span>mí.</span></h1><p class="lead">Las actividades que forman parte de mi día y mis metas.</p></div><div class="heading-number">01 <span>/ PERFIL</span></div></div>
-          <div class="profile-layout">
-            <article class="panel profile-intro">
-              <div class="avatar-large">OC</div><div class="eyebrow">PRESENTACIÓN</div><h2>Oscar Calle</h2>
-              <p>Me gusta combinar el tiempo de estudio con actividades que me mantienen activo y proyectos que me permitan aprender cosas nuevas.</p>
-              <div class="profile-tags"><span>Curioso</span><span>Creativo</span><span>En aprendizaje</span></div>
-            </article>
-            <div class="profile-lists">
-              <article class="panel list-panel"><div class="panel-title"><span class="card-icon orange">⌁</span><div><small>TIEMPO LIBRE</small><h3>Pasatiempos</h3></div></div>
-                <div class="list-row"><span class="list-symbol">01</span><strong>Skate</strong><span class="row-arrow">↗</span></div>
-                <div class="list-row"><span class="list-symbol">02</span><strong>Subir cerros</strong><span class="row-arrow">↗</span></div>
-                <div class="list-row"><span class="list-symbol">03</span><strong>Futsal</strong><span class="row-arrow">↗</span></div>
-              </article>
-              <article class="panel list-panel"><div class="panel-title"><span class="card-icon violet">✧</span><div><small>LO QUE QUIERO DESARROLLAR</small><h3>Intereses</h3></div></div>
-                <div class="list-row"><span class="list-symbol">01</span><strong>Hacer streams</strong><span class="row-arrow">↗</span></div>
-                <div class="list-row"><span class="list-symbol">02</span><strong>Hacer música</strong><span class="row-arrow">↗</span></div>
-                <div class="list-row"><span class="list-symbol">03</span><strong>Desarrollar videojuegos</strong><span class="row-arrow">↗</span></div>
-              </article>
-            </div>
-          </div>
-        </section>
-
-        <!-- RUTINA -->
-        <section class="view" id="view-rutina" aria-labelledby="routineTitle">
-          <div class="view-heading"><div><div class="eyebrow"><span class="eyebrow-line"></span> ORGANIZACIÓN DIARIA</div><h1 id="routineTitle">Mi <span>rutina.</span></h1><p class="lead">Un vistazo rápido a cómo distribuyo mis horas.</p></div><div class="heading-number">02 <span>/ RUTINA</span></div></div>
-          <div class="routine-layout">
-            <article class="panel schedule-panel"><div class="panel-title"><span class="card-icon cyan">◷</span><div><small>AGENDA HABITUAL</small><h3>Un día normal</h3></div><span class="panel-badge">24 HORAS</span></div>
-              <div class="timeline">
-                <div class="timeline-row"><time>07:00</time><span class="timeline-dot"></span><div><strong>Me levanto y voy a la U</strong><small>Me alisto y salgo a clases</small></div></div>
-                <div class="timeline-row"><time>08:30 – 11:45</time><span class="timeline-dot"></span><div><strong>Clases en la universidad</strong><small>Tiempo de estudio</small></div></div>
-                <div class="timeline-row"><time>11:45 – 16:00</time><span class="timeline-dot"></span><div><strong>Casa, almuerzo y tareas</strong><small>Regreso y avanzo pendientes</small></div></div>
-                <div class="timeline-row"><time>16:00 →</time><span class="timeline-dot"></span><div><strong>Descanso y práctica</strong><small>Juego, skate, balón o descanso</small></div></div>
-                <div class="timeline-row"><time>Antes de dormir</time><span class="timeline-dot"></span><div><strong>Como algo y descanso</strong><small>Cierro el día</small></div></div>
-                <div class="timeline-row"><time>01:00</time><span class="timeline-dot"></span><div><strong>A dormir</strong><small>Y el ciclo vuelve a empezar</small></div></div>
-              </div>
-            </article>
-            <article class="panel hours-panel"><div class="panel-title"><span class="card-icon orange">▥</span><div><small>DISTRIBUCIÓN DEL TIEMPO</small><h3>Mi día en horas</h3></div></div>
-              <div class="hours-total"><strong>24</strong><span>horas<br>distribuidas</span></div>
-              <div class="bar-list">
-                <div class="bar-item"><div><span>Dormir</span><b>6 h</b></div><div class="bar-track"><i style="width:25%"></i></div></div>
-                <div class="bar-item"><div><span>Alistarme e ir a la U</span><b>1,5 h</b></div><div class="bar-track"><i style="width:6.25%"></i></div></div>
-                <div class="bar-item"><div><span>Clases en la U</span><b>3,25 h</b></div><div class="bar-track"><i style="width:13.54%"></i></div></div>
-                <div class="bar-item"><div><span>Casa, almuerzo y tarea</span><b>4,25 h</b></div><div class="bar-track"><i style="width:17.71%"></i></div></div>
-                <div class="bar-item"><div><span>Descanso, juegos y práctica</span><b>9 h</b></div><div class="bar-track"><i style="width:37.5%"></i></div></div>
-              </div>
-              <div class="hours-foot"><span>Así se reparte mi rutina habitual.</span><span>100%</span></div>
-            </article>
-          </div>
-        </section>
-
-        <!-- FAVORITOS / EXPLORAR -->
-        <section class="view" id="view-favoritos" aria-labelledby="favoritesTitle">
-          <div class="view-heading compact-heading"><div><div class="eyebrow"><span class="eyebrow-line"></span> MIS GUSTOS</div><h1 id="favoritesTitle">Mis <span>favoritos.</span></h1><p class="lead">Música, videojuegos y un filtro interactivo.</p></div><div class="heading-number">03 <span>/ EXPLORAR</span></div></div>
-          <div class="favorites-layout">
-            <div class="favorites-column">
-              <article class="panel favorites-panel"><div class="panel-title"><span class="card-icon violet">♫</span><div><small>EN MIS AURICULARES</small><h3>Música</h3></div></div>
-                <label class="search-box"><span>⌕</span><input id="musicSearch" type="search" placeholder="Buscar artista o género" aria-label="Buscar música"></label>
-                <div class="favorite-table" id="musicList">
-                  <div class="favorite-row" data-search="ghostemane trap metal"><span class="rank">01</span><div><strong>Ghostemane</strong><small>Trap metal</small></div><span class="genre-tag">METAL</span></div>
-                  <div class="favorite-row" data-search="métricas frías rap"><span class="rank">02</span><div><strong>Métricas Frías</strong><small>Rap</small></div><span class="genre-tag">RAP</span></div>
-                  <div class="favorite-row" data-search="joes yawar cru rap"><span class="rank">03</span><div><strong>Joes Yawar Cru</strong><small>Rap</small></div><span class="genre-tag">RAP</span></div>
-                  <div class="favorite-row" data-search="forty mc rap"><span class="rank">04</span><div><strong>Forty MC</strong><small>Rap</small></div><span class="genre-tag">RAP</span></div>
-                  <p class="empty-result" id="musicEmpty" hidden>No hay resultados para esa búsqueda.</p>
-                </div>
-                <div class="dependent-filter"><div class="mini-heading">ELIGE UN FAVORITO</div><div class="select-grid"><label>Género<select id="genreSelect"><option value="">Selecciona género</option><option value="rap">Rap</option><option value="trap">Trap metal</option></select></label><label>Artista<select id="artistSelect" disabled><option value="">Primero elige género</option></select></label></div><p class="selection-result" id="artistResult">Selecciona un género para continuar.</p></div>
-              </article>
-              <article class="panel games-panel"><div class="panel-title"><span class="card-icon orange">⌘</span><div><small>PARA DESPEJARME</small><h3>Videojuegos</h3></div></div>
-                <label class="search-box"><span>⌕</span><input id="gameSearch" type="search" placeholder="Buscar videojuego" aria-label="Buscar videojuegos"></label>
-                <div class="game-grid" id="gameList">
-                  <div class="game-card" data-search="rocket league fútbol autos"><span class="game-emoji">🚗</span><strong>Rocket League</strong><small>Fútbol con autos</small></div>
-                  <div class="game-card" data-search="pes fútbol"><span class="game-emoji">⚽</span><strong>PES</strong><small>Fútbol</small></div>
-                  <div class="game-card" data-search="minecraft construcción supervivencia"><span class="game-emoji">▧</span><strong>Minecraft</strong><small>Construcción y supervivencia</small></div>
-                  <p class="empty-result" id="gameEmpty" hidden>No hay juegos con ese nombre.</p>
-                </div>
-              </article>
-            </div>
-            <article class="panel cascade-panel"><div class="panel-title"><span class="card-icon cyan">⌘</span><div><small>ACTIVIDAD INTERACTIVA</small><h3>Filtro de 3 capas</h3></div></div>
-              <p class="panel-description">Selecciona un área y luego un módulo. La tercera capa mostrará el elemento que corresponde.</p>
-              <div class="step-label"><span>1</span><label for="areaSelect">Selecciona un área</label></div>
-              <select id="areaSelect" class="field-select"><option value="">Elige un área</option><option value="academico">Académico (UPDS)</option><option value="desarrollo">Desarrollo de software</option></select>
-              <div class="step-label"><span>2</span><label for="moduleSelect">Selecciona un módulo</label></div>
-              <select id="moduleSelect" class="field-select" disabled><option value="">Primero elige un área</option></select>
-              <div class="step-label"><span>3</span><span>Elemento filtrado</span></div>
-              <div class="layer-result" id="layerResult"><span class="result-icon">✦</span><div><small>RESULTADO</small><strong>Esperando selección</strong><p>El resultado aparecerá aquí.</p></div></div>
-              <div class="cascade-foot"><span class="tiny-dot"></span> Filtro dinámico en cascada</div>
-            </article>
-          </div>
-        </section>
-
-        <!-- FORMULARIO -->
-        <section class="view" id="view-contacto" aria-labelledby="contactTitle">
-          <div class="view-heading"><div><div class="eyebrow"><span class="eyebrow-line"></span> VALIDACIÓN DE DATOS</div><h1 id="contactTitle">Formulario <span>personal.</span></h1><p class="lead">Completa los campos. Cada dato se revisa antes de aceptar.</p></div><div class="heading-number">04 <span>/ FORMULARIO</span></div></div>
-          <div class="form-layout">
-            <article class="panel form-panel">
-              <div class="form-topline"><div><small>REGISTRO DE PRÁCTICA</small><h3>Formulario de contacto</h3></div><span class="required-note">* Campos obligatorios</span></div>
-              <form id="personalForm" novalidate>
-                <div class="form-grid">
-                  <div class="form-field"><label for="fullName">Nombre completo <em>*</em></label><input id="fullName" name="fullName" type="text" placeholder="Ej. Juan Pérez" autocomplete="name" required><small class="field-error" id="err-fullName"></small></div>
-                  <div class="form-field"><label for="email">Correo electrónico <em>*</em></label><input id="email" name="email" type="email" placeholder="correo@ejemplo.com" autocomplete="email" required><small class="field-error" id="err-email"></small></div>
-                  <div class="form-field"><label for="phone">Celular <em>*</em></label><input id="phone" name="phone" type="tel" inputmode="numeric" maxlength="8" placeholder="71234567" autocomplete="tel" required><small class="field-error" id="err-phone"></small></div>
-                  <div class="form-field"><label for="birthDate">Fecha de nacimiento <em>*</em></label><input id="birthDate" name="birthDate" type="date" required><small class="field-error" id="err-birthDate"></small></div>
-                  <div class="form-field"><label for="password">Contraseña <em>*</em></label><input id="password" name="password" type="password" placeholder="Mínimo 8 caracteres" autocomplete="new-password" required><small class="field-error" id="err-password"></small></div>
-                  <div class="form-field"><label for="confirmPassword">Repite la contraseña <em>*</em></label><input id="confirmPassword" name="confirmPassword" type="password" placeholder="Confirma tu contraseña" autocomplete="new-password" required><small class="field-error" id="err-confirmPassword"></small></div>
-                  <div class="form-field full-width"><label for="message">Mensaje <em>*</em></label><textarea id="message" name="message" rows="2" maxlength="200" placeholder="Escribe tu mensaje (10 a 200 caracteres)" required></textarea><div class="field-meta"><small class="field-error" id="err-message"></small><small id="charCount">0 / 200</small></div></div>
-                </div>
-                <div class="form-bottom"><label class="check-wrap"><input id="terms" type="checkbox" required><span class="custom-check"></span><span>Acepto que mis datos se usen solo para esta práctica. <em>*</em><small class="field-error" id="err-terms"></small></span></label><button class="primary-btn submit-btn" type="submit">Validar formulario <span>→</span></button></div>
-                <div class="form-status" id="formStatus" role="status" aria-live="polite"></div>
-              </form>
-            </article>
-            <aside class="panel contact-aside"><div class="contact-decoration">✳</div><div class="eyebrow">MANTENGAMOS EL CONTACTO</div><h3>¿Hablamos?</h3><p>Estos son mis medios de contacto y redes.</p>
-              <a class="contact-link" href="https://www.instagram.com/oscarseulpeum.2/" target="_blank" rel="noopener noreferrer"><span class="contact-icon">◎</span><span><small>INSTAGRAM</small><strong>@oscarseulpeum.2</strong></span><b>↗</b></a>
-              <a class="contact-link" href="tel:+59164133234"><span class="contact-icon">⌕</span><span><small>CELULAR</small><strong>64133234</strong></span><b>↗</b></a>
-              <div class="contact-link static-link"><span class="contact-icon">f</span><span><small>FACEBOOK</small><strong>Revient Oscar</strong></span></div>
-              <div class="privacy-note"><span>ⓘ</span> Esta práctica valida los datos en el navegador. No se envían a un servidor.</div>
-            </aside>
-          </div>
-        </section>
-
-        <footer class="app-footer"><span>© 2026 Oscar Calle</span><span>Hecho con curiosidad <b>✳</b></span></footer>
-      </main>
-
-      <nav class="bottom-nav" aria-label="Navegación móvil">
-        <button class="bottom-item active" data-view="inicio"><span>⌂</span><small>Inicio</small></button>
-        <button class="bottom-item" data-view="perfil"><span>◉</span><small>Perfil</small></button>
-        <button class="bottom-item" data-view="rutina"><span>▦</span><small>Rutina</small></button>
-        <button class="bottom-item" data-view="favoritos"><span>✦</span><small>Gustos</small></button>
-        <button class="bottom-item" data-view="contacto"><span>✉</span><small>Formulario</small></button>
-      </nav>
-    </div>
-  </div>
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="vendor/jquery-3.6.0.min.js"></script>
-  <script src="app.js"></script>
+      <a class="primary-btn entry-cta" href="pwa.html">Abrir mi presentación <span>→</span></a>
+      <p class="entry-note">Diseño Web II · Presentación adaptable a celular, tablet y computadora.</p>
+    </section>
+  </main>
 </body>
 </html>
