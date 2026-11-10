@@ -47,17 +47,18 @@ $(document).ready(function () {
     showView(this.dataset.go);
   });
 
-  // Simulación de hidratación: conecta el botón estático con su evento jQuery.
-  // Se ejecuta una sola vez y verifica data-hidratado para evitar eventos duplicados.
+  // Simulación de hidratación: el HTML entrega un botón estático y jQuery
+  // conecta el evento del menú una sola vez, sin mostrar la palabra "Hidratado".
   function hidratarInterfaz() {
     const $box = $('#contenedorMenu');
     if (!$box.length || $box.attr('data-hidratado') === 'true') return;
 
     $('#btnPWA')
       .prop('disabled', false)
-      .text('☰ Menú Interactivo (Hidratado)')
-      .off('click')
-      .on('click', function () {
+      .text('☰')
+      .attr({ 'aria-expanded': 'false', 'aria-label': 'Abrir menú' })
+      .off('click.menu')
+      .on('click.menu', function () {
         const $menu = $('#mobileMenu');
         const opening = !$menu.is(':visible');
         $menu.stop(true, true).slideToggle(300);
@@ -70,7 +71,12 @@ $(document).ready(function () {
     $box.attr('data-hidratado', 'true');
   }
 
-  // La interfaz se muestra primero estática y se hidrata 500 ms después.
+  // Botón independiente para recargar toda la página.
+  $('#refreshPage').off('click.refresh').on('click.refresh', function () {
+    window.location.reload();
+  });
+
+  // La interfaz aparece estática y se conecta 500 ms después.
   setTimeout(hidratarInterfaz, 500);
 });
 
