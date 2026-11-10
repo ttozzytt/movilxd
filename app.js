@@ -41,14 +41,19 @@ $(() => {
     closeMobileMenu();
   });
   $('[data-go]').on('click', function () { showView(this.dataset.go); });
+  // Menú hamburguesa desplegable con el efecto slideToggle de clase.
   $('#mobileMenuToggle').on('click', function () {
-    const opening = !$('#mobileMenu').hasClass('open');
-    $('#mobileMenu').toggleClass('open', opening);
-    $(this).attr({ 'aria-expanded': String(opening), 'aria-label': opening ? 'Cerrar menú' : 'Abrir menú' }).text(opening ? '×' : '☰');
+    const $menu = $('#mobileMenu');
+    const opening = !$menu.is(':visible');
+    $menu.stop(true, true).slideToggle(300);
+    $(this).attr({
+      'aria-expanded': String(opening),
+      'aria-label': opening ? 'Cerrar menú' : 'Abrir menú'
+    }).text(opening ? '×' : '☰');
   });
 });
 function closeMobileMenu() {
-  $('#mobileMenu').removeClass('open');
+  $('#mobileMenu').stop(true, true).slideUp(300);
   $('#mobileMenuToggle').attr({ 'aria-expanded': 'false', 'aria-label': 'Abrir menú' }).text('☰');
 }
 const firstView = location.hash.replace('#', '');
