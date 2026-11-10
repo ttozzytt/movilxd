@@ -105,8 +105,8 @@ addSearch('gameSearch', 'gameList', '.game-card', 'gameEmpty');
 
 // Selección dependiente de género musical -> artista.
 const artistsByGenre = {
-  rap: ['Métricas Frías', 'Joes Yawar Cru', 'Forty MC'],
-  trap: ['Ghostemane']
+  rap: ['Neutro Shorty', 'CRO', 'Charles Ans', 'Penyair', 'Lil Peep'],
+  trap: ['Lil Xan', 'Ghostemane']
 };
 const genreSelect = document.getElementById('genreSelect');
 const artistSelect = document.getElementById('artistSelect');
@@ -221,3 +221,37 @@ function showToast(message) {
   window.clearTimeout(showToast.timer);
   showToast.timer = window.setTimeout(() => toast.classList.remove('show'), 2800);
 }
+
+
+// Galería de fotos: al tocar una imagen se abre en grande.
+const photoViewer = document.getElementById('photoViewer');
+const photoViewerImage = document.getElementById('photoViewerImage');
+const photoViewerCaption = document.getElementById('photoViewerCaption');
+const photoViewerClose = document.getElementById('photoViewerClose');
+
+function closePhotoViewer() {
+  if (!photoViewer) return;
+  photoViewer.classList.remove('open');
+  photoViewer.setAttribute('aria-hidden', 'true');
+  document.body.classList.remove('viewer-open');
+  photoViewerImage.src = '';
+}
+
+document.querySelectorAll('.photo-card[data-photo]').forEach(photoButton => {
+  photoButton.addEventListener('click', () => {
+    photoViewerImage.src = photoButton.dataset.photo;
+    photoViewerImage.alt = photoButton.querySelector('img')?.alt || 'Fotografía personal';
+    photoViewerCaption.textContent = photoButton.dataset.caption || '';
+    photoViewer.classList.add('open');
+    photoViewer.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('viewer-open');
+  });
+});
+
+if (photoViewerClose) photoViewerClose.addEventListener('click', closePhotoViewer);
+if (photoViewer) photoViewer.addEventListener('click', event => {
+  if (event.target === photoViewer) closePhotoViewer();
+});
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape') closePhotoViewer();
+});
