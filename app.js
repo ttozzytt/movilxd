@@ -5,7 +5,29 @@ const pageLabels = { inicio: 'Inicio', perfil: 'Sobre mí', rutina: 'Mi rutina',
 
 function showView(name) {
   if (!views.includes(name)) return;
-  document.querySelectorAll('.view').forEach(view => view.classList.toggle('active', view.id === `view-${name}`));
+
+  const nextView = document.getElementById(`view-${name}`);
+  const currentView = document.querySelector('.view.active');
+  const currentName = currentView ? currentView.id.replace('view-', '') : '';
+
+  // Las pantallas avanzan entrando desde la derecha y retroceden desde la izquierda.
+  if (currentName !== name) {
+    document.querySelectorAll('.view').forEach(view => {
+      view.classList.remove('active', 'slide-from-left', 'slide-from-right');
+    });
+
+    nextView.classList.add('active');
+
+    if (currentName) {
+      const goingForward = views.indexOf(name) > views.indexOf(currentName);
+      const animationClass = goingForward ? 'slide-from-right' : 'slide-from-left';
+      nextView.classList.add(animationClass);
+      nextView.addEventListener('animationend', () => {
+        nextView.classList.remove(animationClass);
+      }, { once: true });
+    }
+  }
+
   document.querySelectorAll('[data-view]').forEach(button => button.classList.toggle('active', button.dataset.view === name));
   document.getElementById('pageName').textContent = pageLabels[name];
   document.getElementById('mainContent').scrollTop = 0;

@@ -244,3 +244,133 @@ body { overscroll-behavior:none; }
   .form-field textarea { height:31px; min-height:31px; }
   .bottom-nav { flex-basis:55px; height:55px; }
 }
+
+
+/* ===== Ajustes visuales solicitados: portada mejor distribuida ===== */
+.quote-decoration, .art-chip, .art-spark { display:none !important; }
+
+.interests-preview {
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: linear-gradient(120deg, rgba(255,139,69,.055), rgba(113,215,208,.035));
+}
+.interests-preview-head {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:10px;
+}
+.interests-preview-head .eyebrow { margin:0; }
+.interest-link {
+  border:0;
+  background:transparent;
+  color:var(--muted);
+  font-size:9px;
+  font-weight:600;
+  white-space:nowrap;
+}
+.interest-link span { color:var(--orange); padding-left:4px; }
+.interest-chips {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+}
+.interest-chip {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:38px;
+  padding:7px 9px;
+  border:1px solid rgba(255,255,255,.075);
+  border-radius:9px;
+  background:rgba(255,255,255,.025);
+  color:#cbd6dc;
+  text-align:center;
+  font-size:9px;
+  line-height:1.3;
+}
+.view#view-inicio.active { justify-content:space-evenly; }
+
+@media (max-width:760px) {
+  .view#view-inicio.active {
+    justify-content:space-evenly;
+    gap:9px;
+  }
+  .welcome-row {
+    display:block;
+    min-height:0;
+    padding:7px 2px 0;
+  }
+  .hero-art {
+    display:grid;
+    height:94px;
+    width:100%;
+    margin:5px auto 0;
+    place-items:center;
+  }
+  .hero-monogram {
+    width:68px;
+    height:68px;
+    border-radius:21px;
+    font-size:28px;
+    letter-spacing:-3px;
+  }
+  .orbit-one { width:150px; height:59px; }
+  .orbit-two { width:127px; height:88px; }
+  .summary-card {
+    min-height:clamp(112px,14vh,132px);
+    padding:11px 8px;
+  }
+  .summary-card small {
+    display:block;
+    font-size:7px;
+    line-height:1.3;
+    margin-top:5px;
+  }
+  .interests-preview {
+    padding:10px 10px;
+  }
+  .interests-preview-head { margin-bottom:8px; }
+  .interest-link { font-size:8px; }
+  .interest-chips { gap:6px; }
+  .interest-chip {
+    min-height:44px;
+    padding:6px 5px;
+    font-size:7px;
+    line-height:1.25;
+    border-radius:8px;
+  }
+  .quote-strip {
+    min-height:54px;
+    padding:9px 12px;
+  }
+}
+@media (max-height:760px) and (max-width:760px) {
+  .view#view-inicio.active { gap:6px; }
+  .hero-art { height:72px; margin-top:2px; }
+  .hero-monogram { width:58px; height:58px; font-size:24px; }
+  .summary-card { min-height:96px; }
+  .interests-preview { padding:7px 9px; }
+  .interest-chip { min-height:34px; }
+}
+
+
+/* Transición sencilla entre pantallas: avanza desde la derecha y vuelve desde la izquierda. */
+.view.active { animation: none; }
+.view.active.slide-from-right {
+  animation: slideFromRight .30s ease-out both;
+}
+.view.active.slide-from-left {
+  animation: slideFromLeft .30s ease-out both;
+}
+@keyframes slideFromRight {
+  from { opacity: .65; transform: translateX(30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes slideFromLeft {
+  from { opacity: .65; transform: translateX(-30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+

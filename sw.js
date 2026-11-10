@@ -1,4 +1,4 @@
-const CACHE_NAME = 'oscar-mi-espacio-v2';
+const CACHE_NAME = 'oscar-mi-espacio-v4';
 const APP_FILES = [
   './', './index.html', './styles.css', './app.js', './manifest.webmanifest',
   './icons/icon.svg', './icons/icon-192.png', './icons/icon-512.png', './vendor/jquery-3.6.0.min.js'
