@@ -1018,3 +1018,9 @@ body.viewer-open { overflow:hidden; }
   .welcome-row { grid-template-columns:minmax(0,1fr) 88px !important; }
   .home-feature-photo { height:132px; }
 }
+
+/* Enlace real a la portada: mantiene el aspecto de la miga de pan. */
+a.breadcrumb-home { display:inline-flex; align-items:center; text-decoration:none; color:inherit; }
+/* La foto principal siempre debe ser visible; evita que reglas antiguas la oculten. */
+.home-feature-photo { display:block !important; visibility:visible !important; opacity:1 !important; }
+.home-feature-photo img { display:block !important; visibility:visible !important; opacity:1 !important; }
