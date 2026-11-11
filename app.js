@@ -1,6 +1,6 @@
 'use strict';
 
-// Vistas existentes en pwa.html.
+// Vistas que existen en pwa.html.
 const vistasOscar = ['inicio', 'perfil', 'rutina', 'favoritos', 'contacto'];
 const nombresVistasOscar = {
   inicio: 'Inicio', perfil: 'Sobre mí', rutina: 'Mi rutina',
@@ -27,7 +27,6 @@ function mostrarVistaOscar(nombreVista) {
     }
   }
 
-  // Actualiza cada botón de navegación por su ID concreto.
   const botonesPorVista = {
     inicio: ['#navInicio', '#mobileInicio', '#bottomInicio'],
     perfil: ['#navPerfil', '#mobilePerfil', '#bottomPerfil'],
@@ -38,7 +37,6 @@ function mostrarVistaOscar(nombreVista) {
   Object.entries(botonesPorVista).forEach(([vista, selectores]) => {
     selectores.forEach(selector => $(selector).toggleClass('active', vista === nombreVista));
   });
-
   $('#pageName').text(nombresVistasOscar[nombreVista]);
   $('#mainContent').scrollTop(0);
   history.replaceState(null, '', '#' + nombreVista);
@@ -51,13 +49,12 @@ function cerrarMenuMovilOscar() {
 
 function abrirFotoOscar(botonFoto) {
   const $botonFoto = $(botonFoto);
-  const $visor = $('#photoViewer');
   $('#photoViewerImage').attr({
     src: $botonFoto.attr('data-photo'),
     alt: $botonFoto.find('img').attr('alt') || 'Fotografía personal de Oscar'
   });
   $('#photoViewerCaption').text($botonFoto.attr('data-caption') || '');
-  $visor.addClass('open').attr('aria-hidden', 'false');
+  $('#photoViewer').addClass('open').attr('aria-hidden', 'false');
   $('body').addClass('viewer-open');
 }
 
@@ -65,167 +62,6 @@ function cerrarFotoOscar() {
   $('#photoViewer').removeClass('open').attr('aria-hidden', 'true');
   $('#photoViewerImage').attr('src', '');
   $('body').removeClass('viewer-open');
-}
-
-function marcarBotonListoOscar(selector) {
-  $(selector).prop('disabled', false).attr('data-hidratado', 'true');
-}
-
-// Cada botón recibe su propio evento, después se habilita y queda marcado como hidratado.
-function hidratarMenuSuperiorOscar() {
-  $('#btnPWA').off('click.menuMovil').on('click.menuMovil', function () {
-    const menuAbierto = $('#mobileMenu').is(':visible');
-    $('#mobileMenu').stop(true, true).slideToggle(300);
-    $(this).attr({
-      'aria-expanded': String(!menuAbierto),
-      'aria-label': menuAbierto ? 'Abrir menú' : 'Cerrar menú'
-    });
-  });
-  marcarBotonListoOscar('#btnPWA');
-
-  $('#btnActualizar').off('click.actualizarPagina').on('click.actualizarPagina', function () {
-    window.location.reload();
-  });
-  marcarBotonListoOscar('#btnActualizar');
-
-  $('#btnIrInicio').off('click.volverInicio').on('click.volverInicio', function () {
-    mostrarVistaOscar('inicio');
-    cerrarMenuMovilOscar();
-  });
-  marcarBotonListoOscar('#btnIrInicio');
-
-  $('#enlaceMarcaInicio').off('click.marcaInicio').on('click.marcaInicio', function (event) {
-    event.preventDefault();
-    mostrarVistaOscar('inicio');
-  }).attr('data-hidratado', 'true');
-}
-
-function hidratarNavegacionOscar() {
-  $('#navInicio').off('click.navLateral').on('click.navLateral', () => mostrarVistaOscar('inicio'));
-  $('#navPerfil').off('click.navLateral').on('click.navLateral', () => mostrarVistaOscar('perfil'));
-  $('#navRutina').off('click.navLateral').on('click.navLateral', () => mostrarVistaOscar('rutina'));
-  $('#navFavoritos').off('click.navLateral').on('click.navLateral', () => mostrarVistaOscar('favoritos'));
-  $('#navContacto').off('click.navLateral').on('click.navLateral', () => mostrarVistaOscar('contacto'));
-  ['#navInicio','#navPerfil','#navRutina','#navFavoritos','#navContacto'].forEach(marcarBotonListoOscar);
-
-  $('#mobileInicio').off('click.navMovil').on('click.navMovil', () => { mostrarVistaOscar('inicio'); cerrarMenuMovilOscar(); });
-  $('#mobilePerfil').off('click.navMovil').on('click.navMovil', () => { mostrarVistaOscar('perfil'); cerrarMenuMovilOscar(); });
-  $('#mobileRutina').off('click.navMovil').on('click.navMovil', () => { mostrarVistaOscar('rutina'); cerrarMenuMovilOscar(); });
-  $('#mobileFavoritos').off('click.navMovil').on('click.navMovil', () => { mostrarVistaOscar('favoritos'); cerrarMenuMovilOscar(); });
-  $('#mobileContacto').off('click.navMovil').on('click.navMovil', () => { mostrarVistaOscar('contacto'); cerrarMenuMovilOscar(); });
-  ['#mobileInicio','#mobilePerfil','#mobileRutina','#mobileFavoritos','#mobileContacto'].forEach(marcarBotonListoOscar);
-
-  $('#bottomInicio').off('click.navInferior').on('click.navInferior', () => mostrarVistaOscar('inicio'));
-  $('#bottomPerfil').off('click.navInferior').on('click.navInferior', () => mostrarVistaOscar('perfil'));
-  $('#bottomRutina').off('click.navInferior').on('click.navInferior', () => mostrarVistaOscar('rutina'));
-  $('#bottomFavoritos').off('click.navInferior').on('click.navInferior', () => mostrarVistaOscar('favoritos'));
-  $('#bottomContacto').off('click.navInferior').on('click.navInferior', () => mostrarVistaOscar('contacto'));
-  ['#bottomInicio','#bottomPerfil','#bottomRutina','#bottomFavoritos','#bottomContacto'].forEach(marcarBotonListoOscar);
-}
-
-function hidratarAccesosDeInicioOscar() {
-  $('#btnConoceme').off('click.accesoInicio').on('click.accesoInicio', () => mostrarVistaOscar('perfil'));
-  $('#btnMisGustos').off('click.accesoInicio').on('click.accesoInicio', () => mostrarVistaOscar('favoritos'));
-  $('#btnTarjetaTiempoLibre').off('click.accesoInicio').on('click.accesoInicio', () => mostrarVistaOscar('perfil'));
-  $('#btnTarjetaGustos').off('click.accesoInicio').on('click.accesoInicio', () => mostrarVistaOscar('favoritos'));
-  $('#btnTarjetaMeta').off('click.accesoInicio').on('click.accesoInicio', () => mostrarVistaOscar('perfil'));
-  $('#btnInteresesPerfil').off('click.accesoInicio').on('click.accesoInicio', () => mostrarVistaOscar('perfil'));
-  ['#btnConoceme','#btnMisGustos','#btnTarjetaTiempoLibre','#btnTarjetaGustos','#btnTarjetaMeta','#btnInteresesPerfil'].forEach(marcarBotonListoOscar);
-}
-
-function hidratarGaleriaOscar() {
-  $('#btnFotoSkateInicio').off('click.foto').on('click.foto', function () { abrirFotoOscar(this); });
-  $('#btnFotoAtardecerInicio').off('click.foto').on('click.foto', function () { abrirFotoOscar(this); });
-  $('#btnFotoPlayaInicio').off('click.foto').on('click.foto', function () { abrirFotoOscar(this); });
-  $('#btnFotoRetratoPerfil').off('click.foto').on('click.foto', function () { abrirFotoOscar(this); });
-  $('#btnFotoPlayaPerfil').off('click.foto').on('click.foto', function () { abrirFotoOscar(this); });
-  $('#btnFotoSkateDetalle').off('click.foto').on('click.foto', function () { abrirFotoOscar(this); });
-  $('#btnFotoSkateparkRutina').off('click.foto').on('click.foto', function () { abrirFotoOscar(this); });
-  $('#btnFotoAtardecerRutina').off('click.foto').on('click.foto', function () { abrirFotoOscar(this); });
-  $('#btnFotoFogataRutina').off('click.foto').on('click.foto', function () { abrirFotoOscar(this); });
-  [
-    '#btnFotoSkateInicio','#btnFotoAtardecerInicio','#btnFotoPlayaInicio',
-    '#btnFotoRetratoPerfil','#btnFotoPlayaPerfil','#btnFotoSkateDetalle',
-    '#btnFotoSkateparkRutina','#btnFotoAtardecerRutina','#btnFotoFogataRutina'
-  ].forEach(marcarBotonListoOscar);
-
-  $('#btnCerrarFoto').off('click.cerrarFoto').on('click.cerrarFoto', cerrarFotoOscar);
-  marcarBotonListoOscar('#btnCerrarFoto');
-
-  $('#photoViewer').off('click.fondoFoto').on('click.fondoFoto', function (event) {
-    if (event.target === this) cerrarFotoOscar();
-  });
-  $(window).off('keydown.teclaFoto').on('keydown.teclaFoto', function (event) {
-    if (event.key === 'Escape') cerrarFotoOscar();
-  });
-}
-
-const modulosPorAreaOscar = {
-  academico: [{ value: 'web2', label: 'Diseño Web II (SIS-0141)', detail: 'Área académica · UPDS' }],
-  desarrollo: [{ value: 'pwa', label: 'Arquitectura PWA', detail: 'Área de desarrollo de software' }]
-};
-
-function hidratarFiltroTresCapasOscar() {
-  $('#areaSelect').off('change.filtroTresCapas').on('change.filtroTresCapas', function () {
-    const areaElegida = this.value;
-    const modulos = modulosPorAreaOscar[areaElegida] || [];
-    $('#moduleSelect').empty().append(new Option('Selecciona un módulo', ''));
-    modulos.forEach(modulo => $('#moduleSelect').append(new Option(modulo.label, modulo.value)));
-    $('#moduleSelect').prop('disabled', modulos.length === 0);
-    $('#layerResult').html('<span class="result-icon">✦</span><div><small>RESULTADO</small><strong>Esperando selección</strong><p>Elige un módulo para ver el elemento.</p></div>');
-  });
-  $('#moduleSelect').off('change.filtroTresCapas').on('change.filtroTresCapas', function () {
-    const modulos = modulosPorAreaOscar[$('#areaSelect').val()] || [];
-    const moduloElegido = modulos.find(modulo => modulo.value === this.value);
-    if (!moduloElegido) {
-      $('#layerResult').html('<span class="result-icon">✦</span><div><small>RESULTADO</small><strong>Esperando selección</strong><p>El resultado aparecerá aquí.</p></div>');
-      return;
-    }
-    $('#layerResult').html('<span class="result-icon">✓</span><div><small>CAPA 3 · ELEMENTO FILTRADO</small><strong>' + moduloElegido.label + '</strong><p>' + moduloElegido.detail + '</p></div>');
-  });
-  $('#areaSelect, #moduleSelect').attr('data-hidratado', 'true');
-}
-
-function hidratarBusquedasOscar() {
-  $('#musicSearch').off('input.busquedaMusica').on('input.busquedaMusica', function () {
-    const texto = this.value.trim().toLocaleLowerCase('es');
-    let visibles = 0;
-    $('#musicList .favorite-row').each(function () {
-      const coincide = this.dataset.search.toLocaleLowerCase('es').includes(texto);
-      this.hidden = !coincide;
-      if (coincide) visibles++;
-    });
-    $('#musicEmpty').prop('hidden', visibles !== 0);
-  });
-  $('#gameSearch').off('input.busquedaJuegos').on('input.busquedaJuegos', function () {
-    const texto = this.value.trim().toLocaleLowerCase('es');
-    let visibles = 0;
-    $('#gameList .game-card').each(function () {
-      const coincide = this.dataset.search.toLocaleLowerCase('es').includes(texto);
-      this.hidden = !coincide;
-      if (coincide) visibles++;
-    });
-    $('#gameEmpty').prop('hidden', visibles !== 0);
-  });
-  $('#musicSearch, #gameSearch').attr('data-hidratado', 'true');
-}
-
-function hidratarSeleccionMusicalOscar() {
-  const artistasPorGenero = {
-    rap: ['Neutro Shorty', 'CRO', 'Charles Ans', 'Penyair', 'Lil Peep'],
-    trap: ['Lil Xan', 'Ghostemane']
-  };
-  $('#genreSelect').off('change.generoMusical').on('change.generoMusical', function () {
-    const generoElegido = this.value;
-    const $artistas = $('#artistSelect').empty().append(new Option('Selecciona un artista', ''));
-    (artistasPorGenero[generoElegido] || []).forEach(artista => $artistas.append(new Option(artista, artista)));
-    $artistas.prop('disabled', !generoElegido);
-    $('#artistResult').text(generoElegido ? 'Ahora selecciona un artista.' : 'Selecciona un género para continuar.');
-  });
-  $('#artistSelect').off('change.artista').on('change.artista', function () {
-    $('#artistResult').text(this.value ? 'Tu selección: ' + this.value : 'Selecciona un artista.');
-  });
-  $('#genreSelect, #artistSelect').attr('data-hidratado', 'true');
 }
 
 function mensajeErrorCampoOscar(idCampo) {
@@ -267,6 +103,7 @@ function mensajeErrorCampoOscar(idCampo) {
     default: return '';
   }
 }
+
 const fechaAhoraOscar = new Date();
 const fechaHoyOscar = new Date(fechaAhoraOscar.getTime() - fechaAhoraOscar.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
 
@@ -279,82 +116,232 @@ function validarCampoOscar(idCampo) {
   return error === '';
 }
 
+let temporizadorAvisoOscar = null;
 function mostrarAvisoOscar(mensaje) {
   const $aviso = $('#toast');
   $aviso.text(mensaje).addClass('show');
-  window.clearTimeout(mostrarAvisoOscar.temporizador);
-  mostrarAvisoOscar.temporizador = window.setTimeout(() => $aviso.removeClass('show'), 2800);
+  window.clearTimeout(temporizadorAvisoOscar);
+  temporizadorAvisoOscar = window.setTimeout(() => $aviso.removeClass('show'), 2800);
 }
 
-function hidratarFormularioOscar() {
-  $('#birthDate').attr('max', fechaHoyOscar);
-  const camposOscar = ['fullName', 'email', 'phone', 'birthDate', 'password', 'confirmPassword', 'message'];
-  camposOscar.forEach(idCampo => {
-    $('#' + idCampo).off('.validacionCampo');
-    $('#' + idCampo).on('blur.validacionCampo', () => validarCampoOscar(idCampo));
-    $('#' + idCampo).on('input.validacionCampo', function () {
-      if ($('#' + idCampo).closest('.form-field').hasClass('invalid')) validarCampoOscar(idCampo);
-      if (idCampo === 'password' && $('#confirmPassword').val()) validarCampoOscar('confirmPassword');
-    }).attr('data-hidratado', 'true');
-  });
-  $('#terms').off('.validacionTerminos').on('change.validacionTerminos', () => validarCampoOscar('terms')).attr('data-hidratado', 'true');
-  $('#message').off('input.contadorMensaje').on('input.contadorMensaje', function () {
-    $('#charCount').text(this.value.length + ' / 200');
-  });
-  $('#btnValidarFormulario').off('click.validarFormulario').on('click.validarFormulario', function (event) {
-    event.preventDefault();
-    $('#personalForm').trigger('submit');
-  });
-  marcarBotonListoOscar('#btnValidarFormulario');
+const modulosPorAreaOscar = {
+  academico: [{ value: 'web2', label: 'Diseño Web II (SIS-0141)', detail: 'Área académica · UPDS' }],
+  desarrollo: [{ value: 'pwa', label: 'Arquitectura PWA', detail: 'Área de desarrollo de software' }]
+};
 
-  $('#personalForm').off('submit.validacionFormulario').on('submit.validacionFormulario', function (event) {
-    event.preventDefault();
-    const resultados = camposOscar.map(validarCampoOscar).concat([validarCampoOscar('terms')]);
-    const primerError = camposOscar.find((idCampo, indice) => !resultados[indice]);
-    if (primerError || !resultados[resultados.length - 1]) {
-      $('#formStatus').text('Revisa los campos marcados antes de continuar.').attr('class', 'form-status error');
-      $('#' + (primerError || 'terms')).trigger('focus');
-      return;
-    }
-    $('#formStatus').text('¡Validación correcta! Los datos pasaron todas las comprobaciones. No se enviaron a un servidor.').attr('class', 'form-status success');
-    this.reset();
-    $('#charCount').text('0 / 200');
-    camposOscar.concat(['terms']).forEach(idCampo => {
-      $('#' + idCampo).closest('.form-field').removeClass('invalid');
-      $('#err-' + idCampo).text('');
+const artistasPorGeneroOscar = {
+  rap: ['Neutro Shorty', 'CRO', 'Charles Ans', 'Penyair', 'Lil Peep'],
+  trap: ['Lil Xan', 'Ghostemane']
+};
+
+// EVENT BUBBLING: el clic nace en el hijo (por ejemplo, el texto de una tarjeta)
+// y sube hasta document. Un solo escuchador delegado atiende todas las tarjetas.
+function hidratarDelegacionEventosOscar() {
+  $(document)
+    .off('click.oscarTarjetas', '.tarjeta-item')
+    .on('click.oscarTarjetas', '.tarjeta-item', function (event) {
+      const destino = this.dataset.destinoTarjeta;
+      console.info('Event Bubbling: clic en hijo recibido por la tarjeta:', event.target);
+      if (destino) mostrarVistaOscar(destino);
     });
-    mostrarAvisoOscar('Formulario validado correctamente.');
-  });
-  $('#personalForm').attr('data-hidratado', 'true');
+
+  // Un solo escuchador atiende navegación, menú, fotos y acciones de la interfaz.
+  $(document)
+    .off('click.oscarNavegacion', '[data-vista-navegacion]')
+    .on('click.oscarNavegacion', '[data-vista-navegacion]', function (event) {
+      event.preventDefault();
+      mostrarVistaOscar(this.dataset.vistaNavegacion);
+      if (this.dataset.cerrarMenu === 'true') cerrarMenuMovilOscar();
+    });
+
+  $(document)
+    .off('click.oscarAcciones', '[data-accion-oscar]')
+    .on('click.oscarAcciones', '[data-accion-oscar]', function (event) {
+      const accion = this.dataset.accionOscar;
+      if (accion === 'alternar-menu') {
+        const menuAbierto = $('#mobileMenu').is(':visible');
+        $('#mobileMenu').stop(true, true).slideToggle(300);
+        $(this).attr({ 'aria-expanded': String(!menuAbierto), 'aria-label': menuAbierto ? 'Abrir menú' : 'Cerrar menú' });
+      } else if (accion === 'actualizar-pagina') {
+        window.location.reload();
+      } else if (accion === 'abrir-foto') {
+        abrirFotoOscar(this);
+      } else if (accion === 'cerrar-foto') {
+        cerrarFotoOscar();
+      }
+    });
+
+  $(document)
+    .off('click.oscarCerrarVisor', '#photoViewer')
+    .on('click.oscarCerrarVisor', '#photoViewer', function (event) {
+      if (event.target === this) cerrarFotoOscar();
+    });
+
+  $(window)
+    .off('keydown.oscarCerrarVisor')
+    .on('keydown.oscarCerrarVisor', function (event) {
+      if (event.key === 'Escape') cerrarFotoOscar();
+    });
 }
 
-function hidratarInterfazOscar() {
-  const $contenedorMenu = $('#contenedorMenu');
-  if (!$contenedorMenu.length || $contenedorMenu.attr('data-hidratado') === 'true') return;
+function hidratarFiltroTresCapasOscar() {
+  $(document)
+    .off('change.oscarArea', '#areaSelect')
+    .on('change.oscarArea', '#areaSelect', function () {
+      const modulos = modulosPorAreaOscar[this.value] || [];
+      $('#moduleSelect').empty().append(new Option('Selecciona un módulo', ''));
+      modulos.forEach(modulo => $('#moduleSelect').append(new Option(modulo.label, modulo.value)));
+      $('#moduleSelect').prop('disabled', modulos.length === 0);
+      $('#layerResult').html('<span class="result-icon">✦</span><div><small>RESULTADO</small><strong>Esperando selección</strong><p>Elige un módulo para ver el elemento.</p></div>');
+    });
 
-  hidratarMenuSuperiorOscar();
-  hidratarNavegacionOscar();
-  hidratarAccesosDeInicioOscar();
-  hidratarGaleriaOscar();
+  $(document)
+    .off('change.oscarModulo', '#moduleSelect')
+    .on('change.oscarModulo', '#moduleSelect', function () {
+      const modulos = modulosPorAreaOscar[$('#areaSelect').val()] || [];
+      const modulo = modulos.find(item => item.value === this.value);
+      if (!modulo) {
+        $('#layerResult').html('<span class="result-icon">✦</span><div><small>RESULTADO</small><strong>Esperando selección</strong><p>El resultado aparecerá aquí.</p></div>');
+        return;
+      }
+      $('#layerResult').html('<span class="result-icon">✓</span><div><small>CAPA 3 · ELEMENTO FILTRADO</small><strong>' + modulo.label + '</strong><p>' + modulo.detail + '</p></div>');
+    });
+}
+
+function hidratarBusquedasOscar() {
+  $(document)
+    .off('input.oscarBusquedaMusica', '#musicSearch')
+    .on('input.oscarBusquedaMusica', '#musicSearch', function () {
+      const texto = this.value.trim().toLocaleLowerCase('es');
+      let visibles = 0;
+      $('#musicList .favorite-row').each(function () {
+        const coincide = (this.dataset.search || '').toLocaleLowerCase('es').includes(texto);
+        this.hidden = !coincide;
+        if (coincide) visibles++;
+      });
+      $('#musicEmpty').prop('hidden', visibles !== 0);
+    });
+
+  $(document)
+    .off('input.oscarBusquedaJuegos', '#gameSearch')
+    .on('input.oscarBusquedaJuegos', '#gameSearch', function () {
+      const texto = this.value.trim().toLocaleLowerCase('es');
+      let visibles = 0;
+      $('#gameList .game-card').each(function () {
+        const coincide = (this.dataset.search || '').toLocaleLowerCase('es').includes(texto);
+        this.hidden = !coincide;
+        if (coincide) visibles++;
+      });
+      $('#gameEmpty').prop('hidden', visibles !== 0);
+    });
+}
+
+function hidratarSeleccionMusicalOscar() {
+  $(document)
+    .off('change.oscarGenero', '#genreSelect')
+    .on('change.oscarGenero', '#genreSelect', function () {
+      const $artistas = $('#artistSelect').empty().append(new Option('Selecciona un artista', ''));
+      (artistasPorGeneroOscar[this.value] || []).forEach(artista => $artistas.append(new Option(artista, artista)));
+      $artistas.prop('disabled', !this.value);
+      $('#artistResult').text(this.value ? 'Ahora selecciona un artista.' : 'Selecciona un género para continuar.');
+    });
+
+  $(document)
+    .off('change.oscarArtista', '#artistSelect')
+    .on('change.oscarArtista', '#artistSelect', function () {
+      $('#artistResult').text(this.value ? 'Tu selección: ' + this.value : 'Selecciona un artista.');
+    });
+}
+
+function hidratarValidacionesOscar() {
+  const camposSelector = '#personalForm .form-field input, #personalForm textarea';
+  $('#birthDate').attr('max', fechaHoyOscar);
+
+  // focusout se delega porque blur no se propaga como un evento normal.
+  $(document)
+    .off('focusout.oscarValidacion', camposSelector)
+    .on('focusout.oscarValidacion', camposSelector, function () {
+      validarCampoOscar(this.id);
+    });
+
+  $(document)
+    .off('input.oscarValidacion', camposSelector)
+    .on('input.oscarValidacion', camposSelector, function () {
+      if ($(this).closest('.form-field').hasClass('invalid')) validarCampoOscar(this.id);
+      if (this.id === 'password' && $('#confirmPassword').val()) validarCampoOscar('confirmPassword');
+      if (this.id === 'message') $('#charCount').text(this.value.length + ' / 200');
+    });
+
+  $(document)
+    .off('change.oscarTerminos', '#terms')
+    .on('change.oscarTerminos', '#terms', function () {
+      validarCampoOscar('terms');
+    });
+
+  $(document)
+    .off('submit.oscarFormulario', '#personalForm')
+    .on('submit.oscarFormulario', '#personalForm', function (event) {
+      event.preventDefault();
+      const campos = ['fullName', 'email', 'phone', 'birthDate', 'password', 'confirmPassword', 'message'];
+      const resultados = campos.map(validarCampoOscar);
+      const terminosValidos = validarCampoOscar('terms');
+      const indiceError = resultados.findIndex(resultado => !resultado);
+      if (indiceError !== -1 || !terminosValidos) {
+        $('#formStatus').text('Revisa los campos marcados antes de continuar.').attr('class', 'form-status error');
+        $('#' + (indiceError !== -1 ? campos[indiceError] : 'terms')).trigger('focus');
+        return;
+      }
+      $('#formStatus').text('¡Validación correcta! Los datos pasaron todas las comprobaciones. No se enviaron a un servidor.').attr('class', 'form-status success');
+      this.reset();
+      $('#charCount').text('0 / 200');
+      campos.concat(['terms']).forEach(idCampo => {
+        $('#' + idCampo).closest('.form-field').removeClass('invalid');
+        $('#err-' + idCampo).text('');
+      });
+      mostrarAvisoOscar('Formulario validado correctamente.');
+    });
+}
+
+function marcarControlesHidratadosOscar() {
+  // Los botones y enlaces empiezan estáticos/deshabilitados en HTML.
+  // Después de conectar los eventos delegados, se activan sin reconstruir el DOM.
+  $('button[data-hidratado="false"]').prop('disabled', false).attr('data-hidratado', 'true');
+  $('[data-hidratado="false"]').not('button').attr('data-hidratado', 'true');
+  $('#personalForm, #areaSelect, #moduleSelect, #genreSelect, #artistSelect, #musicSearch, #gameSearch').attr('data-hidratado', 'true');
+}
+
+let temporizadorHidratacionOscar = null;
+function hidratarInterfazOscar() {
+  const $contenedor = $('#contenedorMenu');
+  if (!$contenedor.length || $contenedor.attr('data-hidratado') === 'true') return;
+
+  hidratarDelegacionEventosOscar();
   hidratarFiltroTresCapasOscar();
   hidratarBusquedasOscar();
   hidratarSeleccionMusicalOscar();
-  hidratarFormularioOscar();
+  hidratarValidacionesOscar();
+  marcarControlesHidratadosOscar();
+  $contenedor.attr('data-hidratado', 'true');
 
-  $contenedorMenu.attr('data-hidratado', 'true');
-  const botonesPendientes = document.querySelectorAll('button[data-hidratado="false"]');
-  if (botonesPendientes.length) {
-    console.error('Quedaron botones sin hidratar:', Array.from(botonesPendientes).map(boton => boton.id || boton.textContent.trim()));
-  } else {
-    console.info('Hidratación completada: ' + document.querySelectorAll('button[data-hidratado=\"true\"]').length + ' botones con eventos conectados.');
-  }
+  const total = document.querySelectorAll('button[data-hidratado="true"]').length;
+  console.info('Hidratación completada:', total, 'botones activados.');
+  console.info('Event Bubbling activo: las acciones se atienden mediante delegación desde document.');
 }
 
-// La vista HTML aparece primero; después de 500 ms JavaScript conecta los eventos al DOM existente.
 $(function () {
-  window.setTimeout(hidratarInterfazOscar, 500);
+  // La inicialización ocurre una sola vez. Se conserva el identificador para poder limpiarlo.
+  window.clearTimeout(temporizadorHidratacionOscar);
+  temporizadorHidratacionOscar = window.setTimeout(hidratarInterfazOscar, 500);
+  const vistaInicial = (window.location.hash || '#inicio').replace('#', '');
+  mostrarVistaOscar(vistasOscar.includes(vistaInicial) ? vistaInicial : 'inicio');
 });
 
-// La primera pantalla se muestra sin esperar a los eventos; las interacciones se conectan en la hidratación.
-const vistaInicialOscar = (window.location.hash || '#inicio').replace('#', '');
-mostrarVistaOscar(vistasOscar.includes(vistaInicialOscar) ? vistaInicialOscar : 'inicio');
+// Limpieza de listeners y temporizador al abandonar la página.
+$(window)
+  .off('pagehide.oscarLimpieza')
+  .on('pagehide.oscarLimpieza', function () {
+    window.clearTimeout(temporizadorHidratacionOscar);
+    $(document).off('.oscarTarjetas .oscarNavegacion .oscarAcciones .oscarCerrarVisor .oscarArea .oscarModulo .oscarBusquedaMusica .oscarBusquedaJuegos .oscarGenero .oscarArtista .oscarValidacion .oscarTerminos .oscarFormulario');
+    $(window).off('keydown.oscarCerrarVisor');
+    window.clearTimeout(temporizadorAvisoOscar);
+  });
