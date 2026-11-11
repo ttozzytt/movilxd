@@ -70,30 +70,35 @@
   });
 })();
 
-// Modo sin conexión: el Service Worker está incluido dentro de pwa.js.
+// Detector sencillo de conexión también en la portada.
+(function detectarEstadoRedPortadaOscar() {
+  const indicador = document.getElementById('estadoRedPortada');
+  if (!indicador) return;
+  function actualizarEstado() {
+    indicador.textContent = `© 2026 Oscar Calle · Diseño Web II · ${navigator.onLine ? 'En línea' : 'Modo offline activo'}`;
+  }
+  window.removeEventListener('online', actualizarEstado);
+  window.removeEventListener('offline', actualizarEstado);
+  window.addEventListener('online', actualizarEstado);
+  window.addEventListener('offline', actualizarEstado);
+  actualizarEstado();
+})();
+
+// Registro del Service Worker estándar indicado por la guía PWA Offline-First.
 (function registrarOfflineOscar() {
   if (!('serviceWorker' in navigator) || location.protocol !== 'https:') return;
   const registrar = async () => {
     try {
-      // Retira únicamente la versión antigua que usaba un sw.js separado.
-      const registros = await navigator.serviceWorker.getRegistrations();
-      const anteriores = registros.filter(registro => {
-        const trabajador = registro.active || registro.waiting || registro.installing;
-        return trabajador && new URL(trabajador.scriptURL).pathname.endsWith('/sw.js');
+      const registro = await navigator.serviceWorker.register('./sw.js', {
+        scope: './',
+        updateViaCache: 'none'
       });
-      if (anteriores.length) {
-        await Promise.all(anteriores.map(registro => registro.unregister()));
-        const nombresCache = await caches.keys();
-        await Promise.all(nombresCache.filter(nombre => /oscar|movilxd/i.test(nombre)).map(nombre => caches.delete(nombre)));
-      }
-      const registro = await navigator.serviceWorker.register('./pwa.js?worker=oscar-offline-v2', {
-        scope: './', updateViaCache: 'none'
-      });
-      console.info('Almacenamiento offline registrado:', registro.scope);
+      console.info('Service Worker PWA registrado con éxito:', registro.scope);
     } catch (error) {
-      console.warn('No se pudo activar el modo offline:', error);
+      console.error('Fallo en el registro del Service Worker:', error);
     }
   };
   if (document.readyState === 'complete') registrar();
   else window.addEventListener('load', registrar, { once: true });
 })();
+

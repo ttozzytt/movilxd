@@ -1,0 +1,23 @@
+{
+  "short_name": "PortafolioPWA",
+  "name": "Aplicación Progresiva Portafolio - UPDS",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "./index.html",
+  "scope": "./",
+  "background_color": "#0f172a",
+  "theme_color": "#f97316",
+  "display": "standalone",
+  "orientation": "portrait",
+  "lang": "es"
+}

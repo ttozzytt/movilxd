@@ -4,10 +4,12 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/>
+  <meta name="theme-color" content="#f97316">
 <meta content="Conoce a Oscar Calle: estudiante de Ingeniería en Sistemas, fan del skate, el rap y los videojuegos." name="description"/>
 <title>Oscar Calle · Mi espacio</title>
-<link href="pwa.css?v=20261111-seis-offline-v2" rel="stylesheet"/>
-<link href="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%23ff8b45%22/&gt;&lt;text x=%2250%25%22 y=%2265%25%22 font-size=%2250%22 text-anchor=%22middle%22 fill=%22%230d1820%22 font-family=%22Arial%22 font-weight=%22bold%22&gt;OC&lt;/text&gt;&lt;/svg&gt;" rel="icon"/></head>
+<link href="pwa.css?v=20261111-pwa-offline-v4" rel="stylesheet"/>
+<link href="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%23ff8b45%22/&gt;&lt;text x=%2250%25%22 y=%2265%25%22 font-size=%2250%22 text-anchor=%22middle%22 fill=%22%230d1820%22 font-family=%22Arial%22 font-weight=%22bold%22&gt;OC&lt;/text&gt;&lt;/svg&gt;" rel="icon"/>  <link rel="manifest" href="manifest.json">
+</head>
 <body>
 <div class="app-shell">
 <aside aria-label="Navegación principal" class="sidebar">
@@ -24,8 +26,8 @@
 <button class="nav-item" data-hidratado="false" data-vista-navegacion="contacto" disabled="" id="navContacto" type="button"><span class="nav-icon">✉</span>Formulario</button>
 </nav>
 <div class="sidebar-bottom">
-<div class="online-dot"></div>
-<span>Presentación personal</span>
+<div class="online-dot" id="estadoRedPunto" aria-hidden="true"></div>
+<span id="estadoRedSidebar">Estado de conexión</span>
 <span class="version">Diseño Web II</span>
 </div>
 </aside>
@@ -34,9 +36,9 @@
 <div class="mobile-brand"><span class="brand-mark small">OC</span><strong>OSCAR CALLE</strong></div>
 <div class="breadcrumb"><button aria-label="Volver a Inicio" class="breadcrumb-home" data-hidratado="false" data-vista-navegacion="inicio" disabled="" id="btnIrInicio" type="button">← MI ESPACIO</button><b>/</b><strong id="pageName">Inicio</strong></div>
 <div class="top-actions">
-<span class="live-label"><i></i> PORTAFOLIO PERSONAL</span>
+<span class="live-label"><i id="estadoRedIndicador"></i><span id="estadoRedTexto">PORTAFOLIO PERSONAL · EN LÍNEA</span></span>
 <button aria-label="Actualizar página" class="refresh-page-btn" data-accion-oscar="actualizar-pagina" data-hidratado="false" disabled="" id="btnActualizar" title="Actualizar página" type="button">↻</button>
-<!-- Los controles aparecen estáticos y app.js conecta sus eventos al completar la hidratación. -->
+<!-- Los controles aparecen estáticos y pwa.js conecta sus eventos al completar la hidratación. -->
 <div data-hidratado="false" id="contenedorMenu">
 <button aria-expanded="false" aria-label="Abrir menú" class="mobile-menu-toggle" data-accion-oscar="alternar-menu" data-hidratado="false" disabled="" id="btnPWA" type="button">☰</button>
 </div>
@@ -253,7 +255,7 @@
 <a class="contact-link" href="https://www.instagram.com/oscarseulpeum.2/" rel="noopener noreferrer" target="_blank"><span class="contact-icon">◎</span><span><small>INSTAGRAM</small><strong>@oscarseulpeum.2</strong></span><b>↗</b></a>
 <a class="contact-link" href="tel:+59164133234"><span class="contact-icon">⌕</span><span><small>CELULAR</small><strong>64133234</strong></span><b>↗</b></a>
 <div class="contact-link static-link"><span class="contact-icon">f</span><span><small>FACEBOOK</small><strong>Revient Oscar</strong></span></div>
-<div class="privacy-note"><span>ⓘ</span> Esta práctica valida los datos en el navegador. No se envían a un servidor.</div>
+<div class="privacy-note"><span>ⓘ</span> Los registros se guardan localmente en este dispositivo. No se envían a un servidor; la contraseña no se almacena.</div>
 </aside>
 </div>
 </section>
@@ -274,6 +276,6 @@
 </div>
 <div aria-live="polite" class="toast" id="toast" role="status"></div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js" defer></script>
-<script src="pwa.js?v=20261111-seis-offline-v2" defer></script>
+<script src="pwa.js?v=20261111-pwa-offline-v4" defer></script>
 </body>
 </html>

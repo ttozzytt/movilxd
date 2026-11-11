@@ -1,120 +1,5 @@
-/*
- * El mismo pwa.js cumple dos funciones:
- * 1) En el navegador ejecuta la aplicación jQuery.
- * 2) En segundo plano funciona como Service Worker para el modo offline.
- * Así se mantienen exactamente seis archivos de código, sin vendor ni sw.js adicional.
- */
-(function iniciarProyectoOscar() {
-  const contextoServiceWorker =
-    typeof ServiceWorkerGlobalScope !== 'undefined' &&
-    self instanceof ServiceWorkerGlobalScope;
+(() => {
 
-  if (contextoServiceWorker) {
-    'use strict';
-    const CACHE_OSCAR = 'oscar-movilxd-seis-offline-v2';
-    const BASE_OSCAR = self.registration.scope;
-    const JQUERY_OSCAR = 'https://code.jquery.com/jquery-3.6.0.min.js';
-    const RECURSOS_OSCAR = [
-      './',
-      './index.html',
-      './index.css',
-      './index.js',
-      './pwa.html',
-      './pwa.css',
-      './pwa.js',
-      './imagenes/retrato-verde.webp',
-      './imagenes/retrato-blanco-negro.webp',
-      './imagenes/selfie-espejo.webp',
-      './imagenes/skate-detalle.webp',
-      './imagenes/skatepark.webp',
-      './imagenes/atardecer.webp',
-      './imagenes/playa.webp',
-      './imagenes/fogata.webp'
-    ];
-
-    self.addEventListener('install', event => {
-      event.waitUntil((async () => {
-        const cache = await caches.open(CACHE_OSCAR);
-        // Guardar los recursos propios del proyecto.
-        for (const ruta of RECURSOS_OSCAR) {
-          const url = new URL(ruta, BASE_OSCAR).href;
-          const respuesta = await fetch(new Request(url, { cache: 'reload' }));
-          if (!respuesta.ok) throw new Error('No se pudo guardar ' + ruta + ' (' + respuesta.status + ')');
-          await cache.put(url, respuesta);
-        }
-        // Guardar jQuery del CDN como respuesta opaca para que también esté disponible offline.
-        try {
-          const solicitudJQuery = new Request(JQUERY_OSCAR, { mode: 'no-cors', cache: 'reload' });
-          const respuestaJQuery = await fetch(solicitudJQuery);
-          if (respuestaJQuery.ok || respuestaJQuery.type === 'opaque') {
-            await cache.put(solicitudJQuery, respuestaJQuery);
-          }
-        } catch (error) {
-          console.warn('jQuery no pudo guardarse para offline; se intentará cargar online:', error);
-        }
-        await self.skipWaiting();
-      })());
-    });
-
-    self.addEventListener('activate', event => {
-      event.waitUntil((async () => {
-        const nombres = await caches.keys();
-        await Promise.all(nombres
-          .filter(nombre => nombre.startsWith('oscar-movilxd-') && nombre !== CACHE_OSCAR)
-          .map(nombre => caches.delete(nombre)));
-        await self.clients.claim();
-      })());
-    });
-
-    self.addEventListener('fetch', event => {
-      const solicitud = event.request;
-      if (solicitud.method !== 'GET') return;
-      const url = new URL(solicitud.url);
-      const esJQuery = url.href === JQUERY_OSCAR;
-      if (url.origin !== self.location.origin && !esJQuery) return;
-
-      if (solicitud.mode === 'navigate') {
-        event.respondWith((async () => {
-          try {
-            const respuesta = await fetch(solicitud);
-            if (respuesta && respuesta.ok) {
-              const cache = await caches.open(CACHE_OSCAR);
-              await cache.put(solicitud, respuesta.clone());
-            }
-            return respuesta;
-          } catch (error) {
-            const cache = await caches.open(CACHE_OSCAR);
-            const guardada = await cache.match(solicitud, { ignoreSearch: true, ignoreVary: true });
-            if (guardada) return guardada;
-            const destino = url.pathname.endsWith('/pwa.html') ? 'pwa.html' : 'index.html';
-            return (await cache.match(new URL(destino, BASE_OSCAR).href)) ||
-              new Response('Abre esta página una vez con Internet para guardarla y usarla offline.', {
-                status: 503, headers: { 'Content-Type': 'text/plain; charset=utf-8' }
-              });
-          }
-        })());
-        return;
-      }
-
-      event.respondWith((async () => {
-        const cache = await caches.open(CACHE_OSCAR);
-        const guardada = await cache.match(solicitud, { ignoreSearch: true, ignoreVary: true });
-        if (guardada) return guardada;
-        try {
-          const respuesta = await fetch(solicitud);
-          if (respuesta && (respuesta.ok || respuesta.type === 'opaque')) {
-            await cache.put(solicitud, respuesta.clone());
-          }
-          return respuesta;
-        } catch (error) {
-          return new Response('', { status: 504, statusText: 'Recurso no disponible offline' });
-        }
-      })());
-    });
-    return;
-  }
-
-  // ===== Código normal de la aplicación web (solo contexto de navegador) =====
 'use strict';
 
 // Vistas que existen en pwa.html.
@@ -241,6 +126,107 @@ function mostrarAvisoOscar(mensaje) {
   temporizadorAvisoOscar = window.setTimeout(() => $aviso.removeClass('show'), 2800);
 }
 
+// DATOS LOCALES: IndexedDB conserva la cola incluso si se cierra el navegador.
+// Nunca se almacenan la contraseña ni su confirmación.
+const BASE_DATOS_OSCAR = 'oscar-pwa-datos-locales';
+const ALMACEN_COLA_OSCAR = 'cola-registros';
+
+function abrirBaseDatosOscar() {
+  return new Promise((resolve, reject) => {
+    if (!('indexedDB' in window)) {
+      reject(new Error('Este navegador no ofrece IndexedDB.'));
+      return;
+    }
+    const solicitud = indexedDB.open(BASE_DATOS_OSCAR, 1);
+    solicitud.onupgradeneeded = () => {
+      const base = solicitud.result;
+      if (!base.objectStoreNames.contains(ALMACEN_COLA_OSCAR)) {
+        const almacen = base.createObjectStore(ALMACEN_COLA_OSCAR, { keyPath: 'id', autoIncrement: true });
+        almacen.createIndex('estado', 'estado', { unique: false });
+      }
+    };
+    solicitud.onsuccess = () => resolve(solicitud.result);
+    solicitud.onerror = () => reject(solicitud.error || new Error('No se pudo abrir IndexedDB.'));
+    solicitud.onblocked = () => reject(new Error('La base local está bloqueada por otra pestaña.'));
+  });
+}
+
+async function guardarRegistroPendienteOscar(datos) {
+  const base = await abrirBaseDatosOscar();
+  return new Promise((resolve, reject) => {
+    const transaccion = base.transaction(ALMACEN_COLA_OSCAR, 'readwrite');
+    let identificador = null;
+    const solicitud = transaccion.objectStore(ALMACEN_COLA_OSCAR).add({
+      creadoEn: new Date().toISOString(),
+      estado: 'pendiente',
+      datos
+    });
+    solicitud.onsuccess = () => { identificador = solicitud.result; };
+    transaccion.oncomplete = () => { base.close(); resolve(identificador); };
+    transaccion.onerror = () => { base.close(); reject(transaccion.error || new Error('Falló el guardado local.')); };
+    transaccion.onabort = () => { base.close(); reject(transaccion.error || new Error('Se canceló el guardado local.')); };
+  });
+}
+
+async function contarRegistrosPendientesOscar() {
+  const base = await abrirBaseDatosOscar();
+  return new Promise((resolve, reject) => {
+    const transaccion = base.transaction(ALMACEN_COLA_OSCAR, 'readonly');
+    let cantidad = 0;
+    const solicitud = transaccion.objectStore(ALMACEN_COLA_OSCAR).count();
+    solicitud.onsuccess = () => { cantidad = solicitud.result; };
+    transaccion.oncomplete = () => { base.close(); resolve(cantidad); };
+    transaccion.onerror = () => { base.close(); reject(transaccion.error || new Error('Falló la consulta local.')); };
+    transaccion.onabort = () => { base.close(); reject(transaccion.error || new Error('Se canceló la consulta local.')); };
+  });
+}
+
+
+async function programarSincronizacionRegistrosOscar() {
+  if (!('serviceWorker' in navigator)) return false;
+  try {
+    const registro = await navigator.serviceWorker.ready;
+    if (registro.sync && typeof registro.sync.register === 'function') {
+      await registro.sync.register('oscar-registros-pendientes');
+      return true;
+    }
+  } catch (error) {
+    console.warn('No se pudo programar la sincronización en segundo plano:', error);
+  }
+  return false;
+}
+
+function actualizarEstadoRedOscar(mostrarMensaje = false) {
+  const enLinea = navigator.onLine;
+  const texto = enLinea ? 'PORTAFOLIO PERSONAL · EN LÍNEA' : 'MODO OFFLINE · DATOS LOCALES';
+  $('#estadoRedTexto').text(texto);
+  $('#estadoRedSidebar').text(enLinea ? 'Con conexión' : 'Modo offline · datos locales');
+  const color = enLinea ? '#76d6a0' : '#f59b55';
+  $('#estadoRedIndicador, #estadoRedPunto').css({ background: color, boxShadow: `0 0 0 4px ${enLinea ? 'rgba(118,214,160,.1)' : 'rgba(245,155,85,.14)'}` });
+
+  if (!mostrarMensaje) return;
+  if (!enLinea) {
+    mostrarAvisoOscar('Modo offline activo. La página y sus recursos están disponibles desde el dispositivo.');
+    return;
+  }
+  contarRegistrosPendientesOscar().then(cantidad => {
+    if (cantidad > 0) {
+      programarSincronizacionRegistrosOscar();
+      mostrarAvisoOscar(`Conexión recuperada. Hay ${cantidad} registro(s) local(es) pendiente(s); falta configurar un servidor para enviarlos.`);
+    } else {
+      mostrarAvisoOscar('Conexión recuperada. La aplicación está en línea.');
+    }
+  }).catch(() => mostrarAvisoOscar('Conexión recuperada.'));
+}
+
+function hidratarDetectorRedOscar() {
+  $(window)
+    .off('online.oscarRed offline.oscarRed')
+    .on('online.oscarRed', () => actualizarEstadoRedOscar(true))
+    .on('offline.oscarRed', () => actualizarEstadoRedOscar(true));
+  actualizarEstadoRedOscar(!navigator.onLine);
+}
+
 const modulosPorAreaOscar = {
   academico: [{ value: 'web2', label: 'Diseño Web II (SIS-0141)', detail: 'Área académica · UPDS' }],
   desarrollo: [{ value: 'pwa', label: 'Arquitectura PWA', detail: 'Área de desarrollo de software' }]
@@ -365,6 +351,53 @@ function hidratarSeleccionMusicalOscar() {
     });
 }
 
+// Persistencia de preferencias no sensibles (filtros y búsquedas) con LocalStorage.
+// No se guarda información personal escrita en el formulario.
+const CLAVE_PREFERENCIAS_OSCAR = 'oscar-pwa-preferencias-v1';
+function hidratarPersistenciaLocalOscar() {
+  const selectorCambios = '#areaSelect, #moduleSelect, #genreSelect, #artistSelect';
+  const selectorBusquedas = '#musicSearch, #gameSearch';
+  const guardarPreferencias = () => {
+    const estado = {
+      area: $('#areaSelect').val() || '',
+      modulo: $('#moduleSelect').val() || '',
+      genero: $('#genreSelect').val() || '',
+      artista: $('#artistSelect').val() || '',
+      busquedaMusica: $('#musicSearch').val() || '',
+      busquedaJuegos: $('#gameSearch').val() || ''
+    };
+    try {
+      localStorage.setItem(CLAVE_PREFERENCIAS_OSCAR, JSON.stringify(estado));
+    } catch (error) {
+      console.warn('No se pudieron guardar las preferencias locales:', error);
+    }
+  };
+
+  $(document)
+    .off('change.oscarPersistencia', selectorCambios)
+    .on('change.oscarPersistencia', selectorCambios, guardarPreferencias)
+    .off('input.oscarPersistencia', selectorBusquedas)
+    .on('input.oscarPersistencia', selectorBusquedas, guardarPreferencias);
+
+  let estado = {};
+  try {
+    estado = JSON.parse(localStorage.getItem(CLAVE_PREFERENCIAS_OSCAR) || '{}') || {};
+  } catch (error) {
+    console.warn('No se pudieron leer las preferencias locales:', error);
+  }
+
+  if (estado.area) {
+    $('#areaSelect').val(estado.area).trigger('change');
+    if (estado.modulo) $('#moduleSelect').val(estado.modulo).trigger('change');
+  }
+  if (estado.genero) {
+    $('#genreSelect').val(estado.genero).trigger('change');
+    if (estado.artista) $('#artistSelect').val(estado.artista).trigger('change');
+  }
+  if (estado.busquedaMusica) $('#musicSearch').val(estado.busquedaMusica).trigger('input');
+  if (estado.busquedaJuegos) $('#gameSearch').val(estado.busquedaJuegos).trigger('input');
+}
+
 function hidratarValidacionesOscar() {
   const camposSelector = '#personalForm .form-field input, #personalForm textarea';
   $('#birthDate').attr('max', fechaHoyOscar);
@@ -403,14 +436,34 @@ function hidratarValidacionesOscar() {
         $('#' + (indiceError !== -1 ? campos[indiceError] : 'terms')).trigger('focus');
         return;
       }
-      $('#formStatus').text('¡Validación correcta! Los datos pasaron todas las comprobaciones. No se enviaron a un servidor.').attr('class', 'form-status success');
-      this.reset();
-      $('#charCount').text('0 / 200');
-      campos.concat(['terms']).forEach(idCampo => {
-        $('#' + idCampo).closest('.form-field').removeClass('invalid');
-        $('#err-' + idCampo).text('');
+      const formulario = this;
+      // La cola conserva solo campos de contacto; jamás almacena contraseñas.
+      const registroLocal = {
+        nombre: $('#fullName').val().trim(),
+        correo: $('#email').val().trim(),
+        celular: $('#phone').val().trim(),
+        fechaNacimiento: $('#birthDate').val(),
+        mensaje: $('#message').val().trim()
+      };
+      $('#formStatus').text('Guardando el registro en este dispositivo…').attr('class', 'form-status');
+      guardarRegistroPendienteOscar(registroLocal).then(() => {
+        programarSincronizacionRegistrosOscar();
+        const mensaje = navigator.onLine
+          ? 'Validación correcta. Registro guardado localmente y pendiente de envío: todavía no hay un servidor configurado. La contraseña no se almacenó.'
+          : 'Validación correcta. Registro guardado localmente y pendiente de envío al recuperar la conexión. La contraseña no se almacenó.';
+        $('#formStatus').text(mensaje).attr('class', 'form-status success');
+        formulario.reset();
+        $('#charCount').text('0 / 200');
+        campos.concat(['terms']).forEach(idCampo => {
+          $('#' + idCampo).closest('.form-field').removeClass('invalid');
+          $('#err-' + idCampo).text('');
+        });
+        mostrarAvisoOscar('Registro guardado localmente. Quedó en la cola pendiente.');
+      }).catch(error => {
+        console.error('No se pudo guardar el registro local:', error);
+        $('#formStatus').text('No se pudo guardar localmente. Tus datos siguen en el formulario; intenta nuevamente.').attr('class', 'form-status error');
+        mostrarAvisoOscar('No se pudo guardar el registro en este dispositivo.');
       });
-      mostrarAvisoOscar('Formulario validado correctamente.');
     });
 }
 
@@ -431,6 +484,7 @@ function hidratarInterfazOscar() {
   hidratarFiltroTresCapasOscar();
   hidratarBusquedasOscar();
   hidratarSeleccionMusicalOscar();
+  hidratarPersistenciaLocalOscar();
   hidratarValidacionesOscar();
   marcarControlesHidratadosOscar();
   $contenedor.attr('data-hidratado', 'true');
@@ -446,6 +500,7 @@ $(function () {
   temporizadorHidratacionOscar = window.setTimeout(hidratarInterfazOscar, 500);
   const vistaInicial = (window.location.hash || '#inicio').replace('#', '');
   mostrarVistaOscar(vistasOscar.includes(vistaInicial) ? vistaInicial : 'inicio');
+  hidratarDetectorRedOscar();
 });
 
 // Limpieza de temporizadores al salir. Los listeners delegados se registran
@@ -470,29 +525,36 @@ $(window)
   });
 
 
-// Registra el mismo Service Worker cuando se abre pwa.html directamente.
+// Registro del Service Worker estándar solicitado en la guía del ingeniero.
 (function registrarOfflineOscar() {
   if (!('serviceWorker' in navigator) || location.protocol !== 'https:') return;
-  (async () => {
+  const registrar = async () => {
     try {
-      const registros = await navigator.serviceWorker.getRegistrations();
-      const anteriores = registros.filter(registro => {
-        const trabajador = registro.active || registro.waiting || registro.installing;
-        return trabajador && new URL(trabajador.scriptURL).pathname.endsWith('/sw.js');
+      const registro = await navigator.serviceWorker.register('./sw.js', {
+        scope: './',
+        updateViaCache: 'none'
       });
-      if (anteriores.length) {
-        await Promise.all(anteriores.map(registro => registro.unregister()));
-        const nombresCache = await caches.keys();
-        await Promise.all(nombresCache.filter(nombre => /oscar|movilxd/i.test(nombre)).map(nombre => caches.delete(nombre)));
-      }
-      const registro = await navigator.serviceWorker.register('./pwa.js?worker=oscar-offline-v2', {
-        scope: './', updateViaCache: 'none'
-      });
-      console.info('Almacenamiento offline registrado:', registro.scope);
+      console.info('Service Worker PWA registrado con éxito:', registro.scope);
+      const cantidad = await contarRegistrosPendientesOscar().catch(() => 0);
+      if (cantidad > 0) programarSincronizacionRegistrosOscar();
     } catch (error) {
-      console.warn('No se pudo activar el modo offline:', error);
+      console.error('Fallo en el registro del Service Worker:', error);
     }
-  })();
+  };
+  if (document.readyState === 'complete') registrar();
+  else window.addEventListener('load', registrar, { once: true });
 })();
+
+// Respuestas del Service Worker sobre el estado de la cola local.
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.addEventListener('message', event => {
+    if (!event.data) return;
+    if (event.data.tipo === 'OSCAR_SYNC_SIN_ENDPOINT') {
+      $('#formStatus').text('Tus datos siguen guardados en este dispositivo. Para enviarlos falta configurar el servidor receptor.').attr('class', 'form-status');
+    } else if (event.data.tipo === 'OSCAR_SYNC_COMPLETADA') {
+      mostrarAvisoOscar('Los registros pendientes se sincronizaron correctamente.');
+    }
+  });
+}
 
 })();
