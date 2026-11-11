@@ -1,11 +1,12 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="es">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/>
 <meta content="Conoce a Oscar Calle: estudiante de Ingeniería en Sistemas, fan del skate, el rap y los videojuegos." name="description"/>
 <title>Oscar Calle · Mi espacio</title>
-<link href="styles.css?v=20261110-refresh-songs-v2" rel="stylesheet"/>
+<link href="styles.css?v=20261111-hydration3" rel="stylesheet"/>
 <script>
 /* Limpia el Service Worker y la caché de versiones anteriores de esta práctica. */
 (async function limpiarVersionAnterior(){
@@ -25,17 +26,17 @@
 <body>
 <div class="app-shell">
 <aside aria-label="Navegación principal" class="sidebar">
-<a aria-label="Ir al inicio" class="brand" data-view="inicio" href="#inicio">
+<a aria-label="Ir al inicio" class="brand" data-hidratado="false" href="#inicio" id="enlaceMarcaInicio">
 <span class="brand-mark">OC</span>
 <span><strong>OSCAR CALLE</strong><small>ESPACIO PERSONAL</small></span>
 </a>
 <div class="side-caption">MENÚ</div>
 <nav class="nav-list">
-<button class="nav-item active" data-view="inicio"><span class="nav-icon">⌂</span>Inicio</button>
-<button class="nav-item" data-view="perfil"><span class="nav-icon">◉</span>Sobre mí</button>
-<button class="nav-item" data-view="rutina"><span class="nav-icon">▦</span>Mi rutina</button>
-<button class="nav-item" data-view="favoritos"><span class="nav-icon">✦</span>Favoritos</button>
-<button class="nav-item" data-view="contacto"><span class="nav-icon">✉</span>Formulario</button>
+<button class="nav-item active" data-hidratado="false" disabled="" id="navInicio" type="button"><span class="nav-icon">⌂</span>Inicio</button>
+<button class="nav-item" data-hidratado="false" disabled="" id="navPerfil" type="button"><span class="nav-icon">◉</span>Sobre mí</button>
+<button class="nav-item" data-hidratado="false" disabled="" id="navRutina" type="button"><span class="nav-icon">▦</span>Mi rutina</button>
+<button class="nav-item" data-hidratado="false" disabled="" id="navFavoritos" type="button"><span class="nav-icon">✦</span>Favoritos</button>
+<button class="nav-item" data-hidratado="false" disabled="" id="navContacto" type="button"><span class="nav-icon">✉</span>Formulario</button>
 </nav>
 <div class="sidebar-bottom">
 <div class="online-dot"></div>
@@ -46,22 +47,22 @@
 <div class="app-column">
 <header class="topbar">
 <div class="mobile-brand"><span class="brand-mark small">OC</span><strong>OSCAR CALLE</strong></div>
-<div class="breadcrumb"><button aria-label="Volver a Inicio" class="breadcrumb-home" data-view="inicio" type="button">← MI ESPACIO</button><b>/</b><strong id="pageName">Inicio</strong></div>
+<div class="breadcrumb"><button aria-label="Volver a Inicio" class="breadcrumb-home" data-hidratado="false" disabled="" id="btnIrInicio" type="button">← MI ESPACIO</button><b>/</b><strong id="pageName">Inicio</strong></div>
 <div class="top-actions">
 <span class="live-label"><i></i> PORTAFOLIO PERSONAL</span>
-<button aria-label="Actualizar página" class="refresh-page-btn" id="refreshPage" title="Actualizar página" type="button">↻</button>
-<!-- El HTML muestra el botón sin interacción; JavaScript conecta su evento al hidratar. -->
-<div id="contenedorMenu" data-hidratado="false">
-<button aria-expanded="false" aria-label="Menú cargando" class="mobile-menu-toggle" disabled id="btnPWA" type="button">Cargando...</button>
+<button aria-label="Actualizar página" class="refresh-page-btn" data-hidratado="false" disabled="" id="btnActualizar" title="Actualizar página" type="button">↻</button>
+<!-- Los controles aparecen estáticos y app.js conecta sus eventos al completar la hidratación. -->
+<div data-hidratado="false" id="contenedorMenu">
+<button aria-expanded="false" aria-label="Abrir menú" class="mobile-menu-toggle" data-hidratado="false" disabled="" id="btnPWA" type="button">☰</button>
 </div>
 </div>
 </header>
 <nav aria-label="Menú desplegable" class="mobile-menu" id="mobileMenu">
-<button data-view="inicio">⌂ <span>Inicio</span></button>
-<button data-view="perfil">◉ <span>Sobre mí</span></button>
-<button data-view="rutina">▦ <span>Mi rutina</span></button>
-<button data-view="favoritos">✦ <span>Favoritos</span></button>
-<button data-view="contacto">✉ <span>Formulario</span></button>
+<button data-hidratado="false" disabled="" id="mobileInicio" type="button">⌂ <span>Inicio</span></button>
+<button data-hidratado="false" disabled="" id="mobilePerfil" type="button">◉ <span>Sobre mí</span></button>
+<button data-hidratado="false" disabled="" id="mobileRutina" type="button">▦ <span>Mi rutina</span></button>
+<button data-hidratado="false" disabled="" id="mobileFavoritos" type="button">✦ <span>Favoritos</span></button>
+<button data-hidratado="false" disabled="" id="mobileContacto" type="button">✉ <span>Formulario</span></button>
 </nav>
 <main class="main-content" id="mainContent">
 <!-- INICIO -->
@@ -73,25 +74,25 @@
 <p class="lead">Tengo 22 años y estudio Ingeniería en Sistemas. Quiero crear videojuegos y algún día trabajar en estudios grandes para seguir aprendiendo.</p>
 <div class="hero-meta"><span>22 AÑOS</span><span>ING. EN SISTEMAS</span><span>FUTURO GAME DEV</span></div>
 <div class="hero-actions">
-<button class="primary-btn" data-go="perfil">Conóceme <span>↗</span></button>
-<button class="text-btn" data-go="favoritos">Mis gustos <span>→</span></button>
+<button class="primary-btn" data-hidratado="false" disabled="" id="btnConoceme" type="button">Conóceme <span>↗</span></button>
+<button class="text-btn" data-hidratado="false" disabled="" id="btnMisGustos" type="button">Mis gustos <span>→</span></button>
 </div>
 </div>
 <figure aria-label="Fotografía personal de Oscar" class="home-feature-photo">
-<img alt="Retrato personal de Oscar con un tono verde" src="imagenes/retrato-verde.webp?v=20261110-refresh-songs-v2" loading="eager" fetchpriority="high"/>
+<img alt="Retrato personal de Oscar con un tono verde" fetchpriority="high" loading="eager" src="imagenes/retrato-verde.webp?v=20261111-hydration2"/>
 <figcaption><span>OC · 22</span><strong>Así soy yo</strong></figcaption>
 </figure>
 </div>
 <div class="section-heading"><div><span class="eyebrow">RESUMEN</span><h2>Cosas que me representan</h2></div><span class="muted-note">Mira un poco más</span></div>
 <div class="summary-grid">
-<button class="summary-card" data-go="perfil"><span class="card-icon orange">↗</span><span class="card-label">TIEMPO LIBRE</span><strong>Skate · Cerros · Futsal</strong><small>Me gusta moverme y salir</small></button>
-<button class="summary-card" data-go="favoritos"><span class="card-icon violet">♫</span><span class="card-label">MIS GUSTOS</span><strong>Rap · Trap metal · Juegos</strong><small>Lo que siempre disfruto</small></button>
-<button class="summary-card" data-go="perfil"><span class="card-icon cyan">✦</span><span class="card-label">MI META</span><strong>Desarrollar videojuegos</strong><small>Aprender y ganar experiencia</small></button>
+<button class="summary-card" data-hidratado="false" disabled="" id="btnTarjetaTiempoLibre" type="button"><span class="card-icon orange">↗</span><span class="card-label">TIEMPO LIBRE</span><strong>Skate · Cerros · Futsal</strong><small>Me gusta moverme y salir</small></button>
+<button class="summary-card" data-hidratado="false" disabled="" id="btnTarjetaGustos" type="button"><span class="card-icon violet">♫</span><span class="card-label">MIS GUSTOS</span><strong>Rap · Trap metal · Juegos</strong><small>Lo que siempre disfruto</small></button>
+<button class="summary-card" data-hidratado="false" disabled="" id="btnTarjetaMeta" type="button"><span class="card-icon cyan">✦</span><span class="card-label">MI META</span><strong>Desarrollar videojuegos</strong><small>Aprender y ganar experiencia</small></button>
 </div>
 <div class="interests-preview">
 <div class="interests-preview-head">
 <span class="eyebrow"><span class="eyebrow-line"></span> AHORA MISMO</span>
-<button class="interest-link" data-go="perfil" type="button">Conóceme →</button>
+<button class="interest-link" data-hidratado="false" disabled="" id="btnInteresesPerfil" type="button">Conóceme →</button>
 </div>
 <div class="interest-chips">
 <span class="interest-chip">Skate y adrenalina</span>
@@ -100,12 +101,12 @@
 </div>
 </div>
 <div class="home-moments">
-  <div class="home-moments-head"><span class="eyebrow">UN POCO DE MI GALERÍA</span><span>Toca una foto para ampliarla</span></div>
-  <div class="home-moments-grid">
-    <button class="photo-card home-moment" data-caption="Un rato practicando skate" data-photo="imagenes/skatepark.webp?v=20261110-refresh-songs-v2" type="button"><img src="imagenes/skatepark.webp?v=20261110-refresh-songs-v2" alt="Oscar con su skate en el parque"><span>Skate</span></button>
-    <button class="photo-card home-moment" data-caption="Atardeceres que vale la pena mirar" data-photo="imagenes/atardecer.webp?v=20261110-refresh-songs-v2" type="button"><img src="imagenes/atardecer.webp?v=20261110-refresh-songs-v2" alt="Atardecer entre árboles"><span>Atardeceres</span></button>
-    <button class="photo-card home-moment" data-caption="Un momento junto al mar" data-photo="imagenes/playa.webp?v=20261110-refresh-songs-v2" type="button"><img src="imagenes/playa.webp?v=20261110-refresh-songs-v2" alt="Oscar en la playa"><span>Salidas</span></button>
-  </div>
+<div class="home-moments-head"><span class="eyebrow">UN POCO DE MI GALERÍA</span><span>Toca una foto para ampliarla</span></div>
+<div class="home-moments-grid">
+<button class="photo-card home-moment" data-caption="Un rato practicando skate" data-hidratado="false" data-photo="imagenes/skatepark.webp?v=20261111-hydration2" disabled="" id="btnFotoSkateInicio" type="button"><img alt="Oscar con su skate en el parque" src="imagenes/skatepark.webp?v=20261111-hydration2"/><span>Skate</span></button>
+<button class="photo-card home-moment" data-caption="Atardeceres que vale la pena mirar" data-hidratado="false" data-photo="imagenes/atardecer.webp?v=20261111-hydration2" disabled="" id="btnFotoAtardecerInicio" type="button"><img alt="Atardecer entre árboles" src="imagenes/atardecer.webp?v=20261111-hydration2"/><span>Atardeceres</span></button>
+<button class="photo-card home-moment" data-caption="Un momento junto al mar" data-hidratado="false" data-photo="imagenes/playa.webp?v=20261111-hydration2" disabled="" id="btnFotoPlayaInicio" type="button"><img alt="Oscar en la playa" src="imagenes/playa.webp?v=20261111-hydration2"/><span>Salidas</span></button>
+</div>
 </div>
 <div class="quote-strip"><span class="quote-mark">“</span><div><small>MI FRASE</small><strong>Yo siempre gano.</strong></div></div>
 </section>
@@ -114,12 +115,12 @@
 <div class="view-heading"><div><div class="eyebrow"><span class="eyebrow-line"></span> PERFIL PERSONAL</div><h1 id="profileTitle">Un poco más de mí.</h1><p class="lead">Lo que me gusta, cómo soy y hacia dónde quiero ir.</p></div><div class="heading-number">01 <span>/ PERFIL</span></div></div>
 <div class="profile-layout">
 <article class="panel profile-intro profile-photo-intro">
-<img alt="Retrato de Oscar con gorro" class="profile-main-photo" src="imagenes/retrato-blanco-negro.webp?v=20261110-refresh-songs-v2"/>
+<img alt="Retrato de Oscar con gorro" class="profile-main-photo" src="imagenes/retrato-blanco-negro.webp?v=20261111-hydration2">
 <div class="eyebrow">PRESENTACIÓN</div>
 <h2>Oscar Calle</h2>
 <p> No agarro confianza con cualquiera, pero cuando me siento cómodo sale mi lado payaso. Me gusta disfrutar el día, caminar, subir cerros y fumar de vez en cuando. </p>
 <div class="profile-tags"><span>22 años</span><span>Curioso</span><span>Payaso con confianza</span></div>
-</article>
+</img></article>
 <div class="profile-lists">
 <article class="panel list-panel">
 <div class="panel-title"><span class="card-icon orange">⌁</span><div><small>LO QUE ME GUSTA</small><h3>Mi forma de disfrutar</h3></div></div>
@@ -135,14 +136,13 @@
 </article>
 </div>
 </div>
-
 <div aria-label="Más fotos personales" class="mini-photo-strip">
-<button class="photo-card mini-photo" data-caption="Una de mis fotos favoritas" data-photo="imagenes/retrato-verde.webp?v=20261110-refresh-songs-v2" type="button">
-<img alt="Retrato con tono verde" src="imagenes/retrato-verde.webp?v=20261110-refresh-songs-v2"/><span>Un retrato mío</span>
-</button>
-<button class="photo-card mini-photo" data-caption="Un momento en la playa" data-photo="imagenes/playa.webp?v=20261110-refresh-songs-v2" type="button">
-<img alt="Foto en la playa" src="imagenes/playa.webp?v=20261110-refresh-songs-v2"/><span>Una salida junto al mar</span>
-</button>
+<button class="photo-card mini-photo" data-caption="Una de mis fotos favoritas" data-hidratado="false" data-photo="imagenes/retrato-verde.webp?v=20261111-hydration2" disabled="" id="btnFotoRetratoPerfil" type="button">
+<img alt="Retrato con tono verde" src="imagenes/retrato-verde.webp?v=20261111-hydration2"><span>Un retrato mío</span>
+</img></button>
+<button class="photo-card mini-photo" data-caption="Un momento en la playa" data-hidratado="false" data-photo="imagenes/playa.webp?v=20261111-hydration2" disabled="" id="btnFotoPlayaPerfil" type="button">
+<img alt="Foto en la playa" src="imagenes/playa.webp?v=20261111-hydration2"><span>Una salida junto al mar</span>
+</img></button>
 </div>
 </section>
 <!-- RUTINA -->
@@ -171,21 +171,20 @@
 <div class="hours-foot"><span>Así se reparte mi rutina habitual.</span><span>100%</span></div>
 </article>
 </div>
-
 <div class="moments-section">
 <div class="section-heading"><div><span class="eyebrow">FUERA DE LA RUTINA</span><h2>Momentos que disfruto</h2></div><span class="muted-note">Fotos de mi día a día</span></div>
 <div class="moments-grid">
-<button class="photo-card" data-caption="El skate siempre está presente" data-photo="imagenes/skate-detalle.webp?v=20261110-refresh-songs-v2" type="button">
-<img alt="Mi skate en la calle" src="imagenes/skate-detalle.webp?v=20261110-refresh-songs-v2"/><span>Mi skate</span>
+<button class="photo-card" data-caption="El skate siempre está presente" data-hidratado="false" data-photo="imagenes/skate-detalle.webp?v=20261111-hydration2" disabled="" id="btnFotoSkateDetalle" type="button">
+<img alt="Mi skate en la calle" src="imagenes/skate-detalle.webp?v=20261111-hydration2"/><span>Mi skate</span>
 </button>
-<button class="photo-card" data-caption="Un rato practicando skate" data-photo="imagenes/skatepark.webp?v=20261110-refresh-songs-v2" type="button">
-<img alt="Practicando skate" src="imagenes/skatepark.webp?v=20261110-refresh-songs-v2"/><span>Practicando</span>
+<button class="photo-card" data-caption="Un rato practicando skate" data-hidratado="false" data-photo="imagenes/skatepark.webp?v=20261111-hydration2" disabled="" id="btnFotoSkateparkRutina" type="button">
+<img alt="Practicando skate" src="imagenes/skatepark.webp?v=20261111-hydration2"/><span>Practicando</span>
 </button>
-<button class="photo-card" data-caption="Atardeceres que vale la pena mirar" data-photo="imagenes/atardecer.webp?v=20261110-refresh-songs-v2" type="button">
-<img alt="Atardecer entre árboles" src="imagenes/atardecer.webp?v=20261110-refresh-songs-v2"/><span>Atardecer</span>
+<button class="photo-card" data-caption="Atardeceres que vale la pena mirar" data-hidratado="false" data-photo="imagenes/atardecer.webp?v=20261111-hydration2" disabled="" id="btnFotoAtardecerRutina" type="button">
+<img alt="Atardecer entre árboles" src="imagenes/atardecer.webp?v=20261111-hydration2"/><span>Atardecer</span>
 </button>
-<button class="photo-card" data-caption="Una noche alrededor del fuego" data-photo="imagenes/fogata.webp?v=20261110-refresh-songs-v2" type="button">
-<img alt="Fogata al aire libre" src="imagenes/fogata.webp?v=20261110-refresh-songs-v2"/><span>Una noche así</span>
+<button class="photo-card" data-caption="Una noche alrededor del fuego" data-hidratado="false" data-photo="imagenes/fogata.webp?v=20261111-hydration2" disabled="" id="btnFotoFogataRutina" type="button">
+<img alt="Fogata al aire libre" src="imagenes/fogata.webp?v=20261111-hydration2"/><span>Una noche así</span>
 </button>
 </div>
 </div>
@@ -207,12 +206,11 @@
 <div class="favorite-row" data-search="lil peep emo rap"><span class="rank">07</span><div><strong>Lil Peep</strong><small>Emo rap</small></div><span class="genre-tag">RAP</span></div>
 <p class="empty-result" hidden="" id="musicEmpty">No hay resultados para esa búsqueda.</p>
 </div>
-
 <div class="top-songs">
-<div class="mini-heading">MIS CANCIONES FAVORITAS</div>
+<div class="mini-heading">CANCIONES QUE TENGO EN REPEAT</div>
 <div class="song-list">
 <span><b>01</b><strong>Betrayed</strong><small>Lil Xan</small></span>
-<span><b>02</b><strong>El reloj</strong><small>Neutro Shorty</small></span>
+<span><b>02</b><strong>El Reloj</strong><small>Neutro Shorty</small></span>
 <span><b>03</b><strong>D(r)own</strong><small>Ghostemane</small></span>
 <span><b>04</b><strong>Pétalos</strong><small>Charles Ans</small></span>
 </div>
@@ -227,7 +225,6 @@
 <div class="game-card" data-search="minecraft construcción supervivencia"><span class="game-emoji">▧</span><strong>Minecraft</strong><small>Construcción y supervivencia</small></div>
 <p class="empty-result" hidden="" id="gameEmpty">No hay juegos con ese nombre.</p>
 </div>
-
 <div class="food-favorites">
 <div class="mini-heading">TAMBIÉN ME GUSTA</div>
 <div class="food-line"><span>🍲</span><div><small>COMIDA FAVORITA</small><strong>Falso conejo</strong></div></div>
@@ -263,7 +260,7 @@
 <div class="form-field"><label for="confirmPassword">Repite la contraseña <em>*</em></label><input autocomplete="new-password" id="confirmPassword" name="confirmPassword" placeholder="Confirma tu contraseña" required="" type="password"/><small class="field-error" id="err-confirmPassword"></small></div>
 <div class="form-field full-width"><label for="message">Mensaje <em>*</em></label><textarea id="message" maxlength="200" name="message" placeholder="Escribe tu mensaje (10 a 200 caracteres)" required="" rows="2"></textarea><div class="field-meta"><small class="field-error" id="err-message"></small><small id="charCount">0 / 200</small></div></div>
 </div>
-<div class="form-bottom"><label class="check-wrap"><input id="terms" required="" type="checkbox"/><span class="custom-check"></span><span>Acepto que mis datos se usen solo para esta práctica. <em>*</em><small class="field-error" id="err-terms"></small></span></label><button class="primary-btn submit-btn" type="submit">Validar formulario <span>→</span></button></div>
+<div class="form-bottom"><label class="check-wrap"><input id="terms" required="" type="checkbox"/><span class="custom-check"></span><span>Acepto que mis datos se usen solo para esta práctica. <em>*</em><small class="field-error" id="err-terms"></small></span></label><button class="primary-btn submit-btn" data-hidratado="false" disabled="" id="btnValidarFormulario" type="submit">Validar formulario <span>→</span></button></div>
 <div aria-live="polite" class="form-status" id="formStatus" role="status"></div>
 </form>
 </article>
@@ -278,21 +275,20 @@
 <footer class="app-footer"><span>© 2026 Oscar Calle</span><span>Hecho con curiosidad <b>✳</b></span></footer>
 </main>
 <nav aria-label="Navegación móvil" class="bottom-nav">
-<button class="bottom-item active" data-view="inicio"><span>⌂</span><small>Inicio</small></button>
-<button class="bottom-item" data-view="perfil"><span>◉</span><small>Perfil</small></button>
-<button class="bottom-item" data-view="rutina"><span>▦</span><small>Rutina</small></button>
-<button class="bottom-item" data-view="favoritos"><span>✦</span><small>Gustos</small></button>
-<button class="bottom-item" data-view="contacto"><span>✉</span><small>Formulario</small></button>
+<button class="bottom-item active" data-hidratado="false" disabled="" id="bottomInicio" type="button"><span>⌂</span><small>Inicio</small></button>
+<button class="bottom-item" data-hidratado="false" disabled="" id="bottomPerfil" type="button"><span>◉</span><small>Perfil</small></button>
+<button class="bottom-item" data-hidratado="false" disabled="" id="bottomRutina" type="button"><span>▦</span><small>Rutina</small></button>
+<button class="bottom-item" data-hidratado="false" disabled="" id="bottomFavoritos" type="button"><span>✦</span><small>Gustos</small></button>
+<button class="bottom-item" data-hidratado="false" disabled="" id="bottomContacto" type="button"><span>✉</span><small>Formulario</small></button>
 </nav>
 </div>
 </div>
-
 <div aria-hidden="true" class="photo-viewer" id="photoViewer">
-<button aria-label="Cerrar foto" class="photo-viewer-close" id="photoViewerClose" type="button">×</button>
+<button aria-label="Cerrar foto" class="photo-viewer-close" data-hidratado="false" disabled="" id="btnCerrarFoto" type="button">×</button>
 <figure><img alt="" id="photoViewerImage" src=""/><figcaption id="photoViewerCaption"></figcaption></figure>
 </div>
 <div aria-live="polite" class="toast" id="toast" role="status"></div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="app.js?v=20261110-refresh-songs-v2"></script>
+<script src="app.js?v=20261111-hydration3"></script>
 </body>
 </html>

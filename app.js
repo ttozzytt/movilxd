@@ -1,295 +1,360 @@
 'use strict';
 
-const views = ['inicio', 'perfil', 'rutina', 'favoritos', 'contacto'];
-const pageLabels = { inicio: 'Inicio', perfil: 'Sobre mí', rutina: 'Mi rutina', favoritos: 'Favoritos', contacto: 'Formulario' };
+// Vistas existentes en pwa.html.
+const vistasOscar = ['inicio', 'perfil', 'rutina', 'favoritos', 'contacto'];
+const nombresVistasOscar = {
+  inicio: 'Inicio', perfil: 'Sobre mí', rutina: 'Mi rutina',
+  favoritos: 'Favoritos', contacto: 'Formulario'
+};
 
-function showView(name) {
-  if (!views.includes(name)) return;
+function mostrarVistaOscar(nombreVista) {
+  if (!vistasOscar.includes(nombreVista)) return;
+  const nuevaVista = document.getElementById('view-' + nombreVista);
+  const vistaActual = document.querySelector('.view.active');
+  const nombreActual = vistaActual ? vistaActual.id.replace('view-', '') : '';
+  if (!nuevaVista) return;
 
-  const nextView = document.getElementById(`view-${name}`);
-  const currentView = document.querySelector('.view.active');
-  const currentName = currentView ? currentView.id.replace('view-', '') : '';
-
-  // Cambio de pantallas: al avanzar entra desde la derecha; al retroceder, desde la izquierda.
-  if (currentName !== name) {
-    document.querySelectorAll('.view').forEach(view => {
-      view.classList.remove('active', 'slide-from-left', 'slide-from-right');
+  if (nombreActual !== nombreVista) {
+    document.querySelectorAll('.view').forEach(vista => {
+      vista.classList.remove('active', 'slide-from-left', 'slide-from-right');
     });
-
-    nextView.classList.add('active');
-
-    if (currentName) {
-      const goingForward = views.indexOf(name) > views.indexOf(currentName);
-      const animationClass = goingForward ? 'slide-from-right' : 'slide-from-left';
-      nextView.classList.add(animationClass);
-      nextView.addEventListener('animationend', () => {
-        nextView.classList.remove(animationClass);
-      }, { once: true });
+    nuevaVista.classList.add('active');
+    if (nombreActual) {
+      const avanza = vistasOscar.indexOf(nombreVista) > vistasOscar.indexOf(nombreActual);
+      const claseMovimiento = avanza ? 'slide-from-right' : 'slide-from-left';
+      nuevaVista.classList.add(claseMovimiento);
+      nuevaVista.addEventListener('animationend', () => nuevaVista.classList.remove(claseMovimiento), { once: true });
     }
   }
 
-  document.querySelectorAll('[data-view]').forEach(button => button.classList.toggle('active', button.dataset.view === name));
-  document.getElementById('pageName').textContent = pageLabels[name];
-  document.getElementById('mainContent').scrollTop = 0;
-  history.replaceState(null, '', `#${name}`);
+  // Actualiza cada botón de navegación por su ID concreto.
+  const botonesPorVista = {
+    inicio: ['#navInicio', '#mobileInicio', '#bottomInicio'],
+    perfil: ['#navPerfil', '#mobilePerfil', '#bottomPerfil'],
+    rutina: ['#navRutina', '#mobileRutina', '#bottomRutina'],
+    favoritos: ['#navFavoritos', '#mobileFavoritos', '#bottomFavoritos'],
+    contacto: ['#navContacto', '#mobileContacto', '#bottomContacto']
+  };
+  Object.entries(botonesPorVista).forEach(([vista, selectores]) => {
+    selectores.forEach(selector => $(selector).toggleClass('active', vista === nombreVista));
+  });
+
+  $('#pageName').text(nombresVistasOscar[nombreVista]);
+  $('#mainContent').scrollTop(0);
+  history.replaceState(null, '', '#' + nombreVista);
 }
 
-// Navegación con delegación de eventos. Se limpia el listener anterior antes de asignarlo.
-$(document).ready(function () {
-  $(document).off('click', '[data-view]');
-  $(document).on('click', '[data-view]', function () {
-    showView(this.dataset.view);
-    closeMobileMenu();
-  });
-
-  $(document).off('click', '[data-go]');
-  $(document).on('click', '[data-go]', function () {
-    showView(this.dataset.go);
-  });
-
-  // Simulación de hidratación: el HTML entrega un botón estático y jQuery
-  // conecta el evento del menú una sola vez, sin mostrar la palabra "Hidratado".
-  function hidratarInterfaz() {
-    const $box = $('#contenedorMenu');
-    if (!$box.length || $box.attr('data-hidratado') === 'true') return;
-
-    $('#btnPWA')
-      .prop('disabled', false)
-      .text('☰')
-      .attr({ 'aria-expanded': 'false', 'aria-label': 'Abrir menú' })
-      .off('click.menu')
-      .on('click.menu', function () {
-        const $menu = $('#mobileMenu');
-        const opening = !$menu.is(':visible');
-        $menu.stop(true, true).slideToggle(300);
-        $(this).attr({
-          'aria-expanded': String(opening),
-          'aria-label': opening ? 'Cerrar menú' : 'Abrir menú'
-        });
-      });
-
-    $box.attr('data-hidratado', 'true');
-  }
-
-  // Botón independiente para recargar toda la página.
-  $('#refreshPage').off('click.refresh').on('click.refresh', function () {
-    window.location.reload();
-  });
-
-  // La interfaz aparece estática y se conecta 500 ms después.
-  setTimeout(hidratarInterfaz, 500);
-});
-
-function closeMobileMenu() {
+function cerrarMenuMovilOscar() {
   $('#mobileMenu').stop(true, true).slideUp(300);
   $('#btnPWA').attr({ 'aria-expanded': 'false', 'aria-label': 'Abrir menú' });
 }
-const firstView = location.hash.replace('#', '');
-showView(views.includes(firstView) ? firstView : 'inicio');
 
-// Filtro de tres capas: área -> módulo -> resultado (tercera capa).
-const modulesByArea = {
+function abrirFotoOscar(botonFoto) {
+  const $botonFoto = $(botonFoto);
+  const $visor = $('#photoViewer');
+  $('#photoViewerImage').attr({
+    src: $botonFoto.attr('data-photo'),
+    alt: $botonFoto.find('img').attr('alt') || 'Fotografía personal de Oscar'
+  });
+  $('#photoViewerCaption').text($botonFoto.attr('data-caption') || '');
+  $visor.addClass('open').attr('aria-hidden', 'false');
+  $('body').addClass('viewer-open');
+}
+
+function cerrarFotoOscar() {
+  $('#photoViewer').removeClass('open').attr('aria-hidden', 'true');
+  $('#photoViewerImage').attr('src', '');
+  $('body').removeClass('viewer-open');
+}
+
+function marcarBotonListoOscar(selector) {
+  $(selector).prop('disabled', false).attr('data-hidratado', 'true');
+}
+
+// Cada botón recibe su propio evento, después se habilita y queda marcado como hidratado.
+function hidratarMenuSuperiorOscar() {
+  $('#btnPWA').off('click.menuMovil').on('click.menuMovil', function () {
+    const menuAbierto = $('#mobileMenu').is(':visible');
+    $('#mobileMenu').stop(true, true).slideToggle(300);
+    $(this).attr({
+      'aria-expanded': String(!menuAbierto),
+      'aria-label': menuAbierto ? 'Abrir menú' : 'Cerrar menú'
+    });
+  });
+  marcarBotonListoOscar('#btnPWA');
+
+  $('#btnActualizar').off('click.actualizarPagina').on('click.actualizarPagina', function () {
+    window.location.reload();
+  });
+  marcarBotonListoOscar('#btnActualizar');
+
+  $('#btnIrInicio').off('click.volverInicio').on('click.volverInicio', function () {
+    mostrarVistaOscar('inicio');
+    cerrarMenuMovilOscar();
+  });
+  marcarBotonListoOscar('#btnIrInicio');
+
+  $('#enlaceMarcaInicio').off('click.marcaInicio').on('click.marcaInicio', function (event) {
+    event.preventDefault();
+    mostrarVistaOscar('inicio');
+  }).attr('data-hidratado', 'true');
+}
+
+function hidratarNavegacionOscar() {
+  $('#navInicio').off('click.navLateral').on('click.navLateral', () => mostrarVistaOscar('inicio'));
+  $('#navPerfil').off('click.navLateral').on('click.navLateral', () => mostrarVistaOscar('perfil'));
+  $('#navRutina').off('click.navLateral').on('click.navLateral', () => mostrarVistaOscar('rutina'));
+  $('#navFavoritos').off('click.navLateral').on('click.navLateral', () => mostrarVistaOscar('favoritos'));
+  $('#navContacto').off('click.navLateral').on('click.navLateral', () => mostrarVistaOscar('contacto'));
+  ['#navInicio','#navPerfil','#navRutina','#navFavoritos','#navContacto'].forEach(marcarBotonListoOscar);
+
+  $('#mobileInicio').off('click.navMovil').on('click.navMovil', () => { mostrarVistaOscar('inicio'); cerrarMenuMovilOscar(); });
+  $('#mobilePerfil').off('click.navMovil').on('click.navMovil', () => { mostrarVistaOscar('perfil'); cerrarMenuMovilOscar(); });
+  $('#mobileRutina').off('click.navMovil').on('click.navMovil', () => { mostrarVistaOscar('rutina'); cerrarMenuMovilOscar(); });
+  $('#mobileFavoritos').off('click.navMovil').on('click.navMovil', () => { mostrarVistaOscar('favoritos'); cerrarMenuMovilOscar(); });
+  $('#mobileContacto').off('click.navMovil').on('click.navMovil', () => { mostrarVistaOscar('contacto'); cerrarMenuMovilOscar(); });
+  ['#mobileInicio','#mobilePerfil','#mobileRutina','#mobileFavoritos','#mobileContacto'].forEach(marcarBotonListoOscar);
+
+  $('#bottomInicio').off('click.navInferior').on('click.navInferior', () => mostrarVistaOscar('inicio'));
+  $('#bottomPerfil').off('click.navInferior').on('click.navInferior', () => mostrarVistaOscar('perfil'));
+  $('#bottomRutina').off('click.navInferior').on('click.navInferior', () => mostrarVistaOscar('rutina'));
+  $('#bottomFavoritos').off('click.navInferior').on('click.navInferior', () => mostrarVistaOscar('favoritos'));
+  $('#bottomContacto').off('click.navInferior').on('click.navInferior', () => mostrarVistaOscar('contacto'));
+  ['#bottomInicio','#bottomPerfil','#bottomRutina','#bottomFavoritos','#bottomContacto'].forEach(marcarBotonListoOscar);
+}
+
+function hidratarAccesosDeInicioOscar() {
+  $('#btnConoceme').off('click.accesoInicio').on('click.accesoInicio', () => mostrarVistaOscar('perfil'));
+  $('#btnMisGustos').off('click.accesoInicio').on('click.accesoInicio', () => mostrarVistaOscar('favoritos'));
+  $('#btnTarjetaTiempoLibre').off('click.accesoInicio').on('click.accesoInicio', () => mostrarVistaOscar('perfil'));
+  $('#btnTarjetaGustos').off('click.accesoInicio').on('click.accesoInicio', () => mostrarVistaOscar('favoritos'));
+  $('#btnTarjetaMeta').off('click.accesoInicio').on('click.accesoInicio', () => mostrarVistaOscar('perfil'));
+  $('#btnInteresesPerfil').off('click.accesoInicio').on('click.accesoInicio', () => mostrarVistaOscar('perfil'));
+  ['#btnConoceme','#btnMisGustos','#btnTarjetaTiempoLibre','#btnTarjetaGustos','#btnTarjetaMeta','#btnInteresesPerfil'].forEach(marcarBotonListoOscar);
+}
+
+function hidratarGaleriaOscar() {
+  $('#btnFotoSkateInicio').off('click.foto').on('click.foto', function () { abrirFotoOscar(this); });
+  $('#btnFotoAtardecerInicio').off('click.foto').on('click.foto', function () { abrirFotoOscar(this); });
+  $('#btnFotoPlayaInicio').off('click.foto').on('click.foto', function () { abrirFotoOscar(this); });
+  $('#btnFotoRetratoPerfil').off('click.foto').on('click.foto', function () { abrirFotoOscar(this); });
+  $('#btnFotoPlayaPerfil').off('click.foto').on('click.foto', function () { abrirFotoOscar(this); });
+  $('#btnFotoSkateDetalle').off('click.foto').on('click.foto', function () { abrirFotoOscar(this); });
+  $('#btnFotoSkateparkRutina').off('click.foto').on('click.foto', function () { abrirFotoOscar(this); });
+  $('#btnFotoAtardecerRutina').off('click.foto').on('click.foto', function () { abrirFotoOscar(this); });
+  $('#btnFotoFogataRutina').off('click.foto').on('click.foto', function () { abrirFotoOscar(this); });
+  [
+    '#btnFotoSkateInicio','#btnFotoAtardecerInicio','#btnFotoPlayaInicio',
+    '#btnFotoRetratoPerfil','#btnFotoPlayaPerfil','#btnFotoSkateDetalle',
+    '#btnFotoSkateparkRutina','#btnFotoAtardecerRutina','#btnFotoFogataRutina'
+  ].forEach(marcarBotonListoOscar);
+
+  $('#btnCerrarFoto').off('click.cerrarFoto').on('click.cerrarFoto', cerrarFotoOscar);
+  marcarBotonListoOscar('#btnCerrarFoto');
+
+  $('#photoViewer').off('click.fondoFoto').on('click.fondoFoto', function (event) {
+    if (event.target === this) cerrarFotoOscar();
+  });
+  $(window).off('keydown.teclaFoto').on('keydown.teclaFoto', function (event) {
+    if (event.key === 'Escape') cerrarFotoOscar();
+  });
+}
+
+const modulosPorAreaOscar = {
   academico: [{ value: 'web2', label: 'Diseño Web II (SIS-0141)', detail: 'Área académica · UPDS' }],
   desarrollo: [{ value: 'pwa', label: 'Arquitectura PWA', detail: 'Área de desarrollo de software' }]
 };
-const areaSelect = document.getElementById('areaSelect');
-const moduleSelect = document.getElementById('moduleSelect');
-const layerResult = document.getElementById('layerResult');
-$('#areaSelect').off('change.filtro').on('change.filtro', function () {
-  const selectedArea = $(this).val();
-  $('#moduleSelect').empty().append(new Option('Selecciona un módulo', ''));
-  const modules = modulesByArea[selectedArea] || [];
-  modules.forEach(module => $('#moduleSelect').append(new Option(module.label, module.value)));
-  $('#moduleSelect').prop('disabled', modules.length === 0);
-  $('#layerResult').html('<span class="result-icon">✦</span><div><small>RESULTADO</small><strong>Esperando selección</strong><p>Elige un módulo para ver el elemento.</p></div>');
-});
-$('#moduleSelect').off('change.filtro').on('change.filtro', function () {
-  const selected = (modulesByArea[$('#areaSelect').val()] || []).find(module => module.value === $(this).val());
-  if (!selected) {
-    $('#layerResult').html('<span class="result-icon">✦</span><div><small>RESULTADO</small><strong>Esperando selección</strong><p>El resultado aparecerá aquí.</p></div>');
-    return;
-  }
-  $('#layerResult').html(`<span class="result-icon">✓</span><div><small>CAPA 3 · ELEMENTO FILTRADO</small><strong>${selected.label}</strong><p>${selected.detail}</p></div>`);
-});
 
-// Búsqueda local de artistas y videojuegos.
-function addSearch(inputId, listId, itemSelector, emptyId) {
-  const input = document.getElementById(inputId);
-  const list = document.getElementById(listId);
-  const empty = document.getElementById(emptyId);
-  input.addEventListener('input', () => {
-    const query = input.value.trim().toLocaleLowerCase('es');
-    let visible = 0;
-    list.querySelectorAll(itemSelector).forEach(item => {
-      const match = item.dataset.search.toLocaleLowerCase('es').includes(query);
-      item.hidden = !match;
-      if (match) visible++;
-    });
-    empty.hidden = visible !== 0;
+function hidratarFiltroTresCapasOscar() {
+  $('#areaSelect').off('change.filtroTresCapas').on('change.filtroTresCapas', function () {
+    const areaElegida = this.value;
+    const modulos = modulosPorAreaOscar[areaElegida] || [];
+    $('#moduleSelect').empty().append(new Option('Selecciona un módulo', ''));
+    modulos.forEach(modulo => $('#moduleSelect').append(new Option(modulo.label, modulo.value)));
+    $('#moduleSelect').prop('disabled', modulos.length === 0);
+    $('#layerResult').html('<span class="result-icon">✦</span><div><small>RESULTADO</small><strong>Esperando selección</strong><p>Elige un módulo para ver el elemento.</p></div>');
   });
+  $('#moduleSelect').off('change.filtroTresCapas').on('change.filtroTresCapas', function () {
+    const modulos = modulosPorAreaOscar[$('#areaSelect').val()] || [];
+    const moduloElegido = modulos.find(modulo => modulo.value === this.value);
+    if (!moduloElegido) {
+      $('#layerResult').html('<span class="result-icon">✦</span><div><small>RESULTADO</small><strong>Esperando selección</strong><p>El resultado aparecerá aquí.</p></div>');
+      return;
+    }
+    $('#layerResult').html('<span class="result-icon">✓</span><div><small>CAPA 3 · ELEMENTO FILTRADO</small><strong>' + moduloElegido.label + '</strong><p>' + moduloElegido.detail + '</p></div>');
+  });
+  $('#areaSelect, #moduleSelect').attr('data-hidratado', 'true');
 }
-addSearch('musicSearch', 'musicList', '.favorite-row', 'musicEmpty');
-addSearch('gameSearch', 'gameList', '.game-card', 'gameEmpty');
 
-// Selección dependiente de género musical -> artista.
-const artistsByGenre = {
-  rap: ['Neutro Shorty', 'CRO', 'Charles Ans', 'Penyair', 'Lil Peep'],
-  trap: ['Lil Xan', 'Ghostemane']
-};
-const genreSelect = document.getElementById('genreSelect');
-const artistSelect = document.getElementById('artistSelect');
-const artistResult = document.getElementById('artistResult');
-$('#genreSelect').off('change.genero').on('change.genero', function () {
-  artistSelect.innerHTML = '<option value="">Selecciona un artista</option>';
-  (artistsByGenre[this.value] || []).forEach(artist => artistSelect.add(new Option(artist, artist)));
-  artistSelect.disabled = !this.value;
-  artistResult.textContent = this.value ? 'Ahora selecciona un artista.' : 'Selecciona un género para continuar.';
-});
+function hidratarBusquedasOscar() {
+  $('#musicSearch').off('input.busquedaMusica').on('input.busquedaMusica', function () {
+    const texto = this.value.trim().toLocaleLowerCase('es');
+    let visibles = 0;
+    $('#musicList .favorite-row').each(function () {
+      const coincide = this.dataset.search.toLocaleLowerCase('es').includes(texto);
+      this.hidden = !coincide;
+      if (coincide) visibles++;
+    });
+    $('#musicEmpty').prop('hidden', visibles !== 0);
+  });
+  $('#gameSearch').off('input.busquedaJuegos').on('input.busquedaJuegos', function () {
+    const texto = this.value.trim().toLocaleLowerCase('es');
+    let visibles = 0;
+    $('#gameList .game-card').each(function () {
+      const coincide = this.dataset.search.toLocaleLowerCase('es').includes(texto);
+      this.hidden = !coincide;
+      if (coincide) visibles++;
+    });
+    $('#gameEmpty').prop('hidden', visibles !== 0);
+  });
+  $('#musicSearch, #gameSearch').attr('data-hidratado', 'true');
+}
 
-$('#artistSelect').off('change.genero').on('change.genero', function () {
-  artistResult.textContent = this.value ? `Tu selección: ${this.value}` : 'Selecciona un artista.';
-});
+function hidratarSeleccionMusicalOscar() {
+  const artistasPorGenero = {
+    rap: ['Neutro Shorty', 'CRO', 'Charles Ans', 'Penyair', 'Lil Peep'],
+    trap: ['Lil Xan', 'Ghostemane']
+  };
+  $('#genreSelect').off('change.generoMusical').on('change.generoMusical', function () {
+    const generoElegido = this.value;
+    const $artistas = $('#artistSelect').empty().append(new Option('Selecciona un artista', ''));
+    (artistasPorGenero[generoElegido] || []).forEach(artista => $artistas.append(new Option(artista, artista)));
+    $artistas.prop('disabled', !generoElegido);
+    $('#artistResult').text(generoElegido ? 'Ahora selecciona un artista.' : 'Selecciona un género para continuar.');
+  });
+  $('#artistSelect').off('change.artista').on('change.artista', function () {
+    $('#artistResult').text(this.value ? 'Tu selección: ' + this.value : 'Selecciona un artista.');
+  });
+  $('#genreSelect, #artistSelect').attr('data-hidratado', 'true');
+}
 
-// Validación del formulario: errores por campo, validación al salir/editar y confirmación local.
-const form = document.getElementById('personalForm');
-const fieldIds = ['fullName', 'email', 'phone', 'birthDate', 'password', 'confirmPassword', 'message', 'terms'];
-const status = document.getElementById('formStatus');
-const today = new Date();
-const localToday = new Date(today.getTime() - today.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
-document.getElementById('birthDate').max = localToday;
-
-function getError(id) {
-  const value = document.getElementById(id).value.trim();
-  switch (id) {
+function mensajeErrorCampoOscar(idCampo) {
+  const valor = $('#' + idCampo).val().trim();
+  switch (idCampo) {
     case 'fullName':
-      if (!value) return 'Escribe tu nombre completo.';
-      if (value.length < 3) return 'Debe tener al menos 3 caracteres.';
-      if (!/^[\p{L}][\p{L}\s'.-]{1,59}$/u.test(value)) return 'Usa letras y separadores válidos.';
+      if (!valor) return 'Escribe tu nombre completo.';
+      if (valor.length < 3) return 'Debe tener al menos 3 caracteres.';
+      if (!/^[\p{L}][\p{L}\s'.-]{1,59}$/u.test(valor)) return 'Usa letras y separadores válidos.';
       return '';
     case 'email':
-      if (!value) return 'El correo es obligatorio.';
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value)) return 'Ingresa un correo válido.';
+      if (!valor) return 'El correo es obligatorio.';
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(valor)) return 'Ingresa un correo válido.';
       return '';
     case 'phone':
-      if (!value) return 'El celular es obligatorio.';
-      if (!/^\d{8}$/.test(value)) return 'Ingresa los 8 dígitos del celular.';
+      if (!valor) return 'El celular es obligatorio.';
+      if (!/^\d{8}$/.test(valor)) return 'Ingresa los 8 dígitos del celular.';
       return '';
     case 'birthDate':
-      if (!value) return 'Selecciona tu fecha de nacimiento.';
-      if (value > localToday) return 'La fecha no puede ser futura.';
+      if (!valor) return 'Selecciona tu fecha de nacimiento.';
+      if (valor > fechaHoyOscar) return 'La fecha no puede ser futura.';
       return '';
     case 'password':
-      if (!value) return 'La contraseña es obligatoria.';
-      if (value.length < 8) return 'Usa al menos 8 caracteres.';
-      if (!/[A-ZÁÉÍÓÚÑ]/.test(value) || !/[a-záéíóúñ]/.test(value) || !/\d/.test(value)) return 'Incluye mayúscula, minúscula y número.';
+      if (!valor) return 'La contraseña es obligatoria.';
+      if (valor.length < 8) return 'Usa al menos 8 caracteres.';
+      if (!/[A-ZÁÉÍÓÚÑ]/.test(valor) || !/[a-záéíóúñ]/.test(valor) || !/\d/.test(valor)) return 'Incluye mayúscula, minúscula y número.';
       return '';
     case 'confirmPassword':
-      if (!value) return 'Repite la contraseña.';
-      if (value !== document.getElementById('password').value) return 'Las contraseñas no coinciden.';
+      if (!valor) return 'Repite la contraseña.';
+      if (valor !== $('#password').val()) return 'Las contraseñas no coinciden.';
       return '';
     case 'message':
-      if (!value) return 'Escribe un mensaje.';
-      if (value.length < 10) return 'El mensaje debe tener al menos 10 caracteres.';
-      if (value.length > 200) return 'Superaste el máximo de 200 caracteres.';
+      if (!valor) return 'Escribe un mensaje.';
+      if (valor.length < 10) return 'El mensaje debe tener al menos 10 caracteres.';
+      if (valor.length > 200) return 'Superaste el máximo de 200 caracteres.';
       return '';
     case 'terms':
-      return document.getElementById('terms').checked ? '' : 'Debes aceptar esta condición.';
+      return $('#terms').prop('checked') ? '' : 'Debes aceptar esta condición.';
     default: return '';
   }
 }
-function validateField(id) {
-  const field = document.getElementById(id);
-  const error = getError(id);
-  const wrapper = field.closest('.form-field');
-  if (wrapper) wrapper.classList.toggle('invalid', Boolean(error));
-  const message = document.getElementById(`err-${id}`);
-  if (message) message.textContent = error;
-  if (id === 'terms') document.getElementById('err-terms').textContent = error;
-  return !error;
+const fechaAhoraOscar = new Date();
+const fechaHoyOscar = new Date(fechaAhoraOscar.getTime() - fechaAhoraOscar.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+
+function validarCampoOscar(idCampo) {
+  const error = mensajeErrorCampoOscar(idCampo);
+  const $campo = $('#' + idCampo);
+  const $contenedor = $campo.closest('.form-field');
+  if ($contenedor.length) $contenedor.toggleClass('invalid', Boolean(error));
+  $('#err-' + idCampo).text(error);
+  return error === '';
 }
-fieldIds.forEach(id => {
-  const $element = $(`#${id}`);
-  const eventName = id === 'terms' ? 'change' : 'blur';
 
-  // Limpia eventos de validación anteriores antes de volver a registrarlos.
-  $element.off('.validacion');
-  $element.on(`${eventName}.validacion`, () => validateField(id));
+function mostrarAvisoOscar(mensaje) {
+  const $aviso = $('#toast');
+  $aviso.text(mensaje).addClass('show');
+  window.clearTimeout(mostrarAvisoOscar.temporizador);
+  mostrarAvisoOscar.temporizador = window.setTimeout(() => $aviso.removeClass('show'), 2800);
+}
 
-  if (id !== 'terms') {
-    $element.on('input.validacion', () => {
-      if ($element.closest('.form-field').hasClass('invalid')) validateField(id);
-      if (id === 'password' && $('#confirmPassword').val()) validateField('confirmPassword');
+function hidratarFormularioOscar() {
+  $('#birthDate').attr('max', fechaHoyOscar);
+  const camposOscar = ['fullName', 'email', 'phone', 'birthDate', 'password', 'confirmPassword', 'message'];
+  camposOscar.forEach(idCampo => {
+    $('#' + idCampo).off('.validacionCampo');
+    $('#' + idCampo).on('blur.validacionCampo', () => validarCampoOscar(idCampo));
+    $('#' + idCampo).on('input.validacionCampo', function () {
+      if ($('#' + idCampo).closest('.form-field').hasClass('invalid')) validarCampoOscar(idCampo);
+      if (idCampo === 'password' && $('#confirmPassword').val()) validarCampoOscar('confirmPassword');
+    }).attr('data-hidratado', 'true');
+  });
+  $('#terms').off('.validacionTerminos').on('change.validacionTerminos', () => validarCampoOscar('terms')).attr('data-hidratado', 'true');
+  $('#message').off('input.contadorMensaje').on('input.contadorMensaje', function () {
+    $('#charCount').text(this.value.length + ' / 200');
+  });
+  $('#btnValidarFormulario').off('click.validarFormulario').on('click.validarFormulario', function (event) {
+    event.preventDefault();
+    $('#personalForm').trigger('submit');
+  });
+  marcarBotonListoOscar('#btnValidarFormulario');
+
+  $('#personalForm').off('submit.validacionFormulario').on('submit.validacionFormulario', function (event) {
+    event.preventDefault();
+    const resultados = camposOscar.map(validarCampoOscar).concat([validarCampoOscar('terms')]);
+    const primerError = camposOscar.find((idCampo, indice) => !resultados[indice]);
+    if (primerError || !resultados[resultados.length - 1]) {
+      $('#formStatus').text('Revisa los campos marcados antes de continuar.').attr('class', 'form-status error');
+      $('#' + (primerError || 'terms')).trigger('focus');
+      return;
+    }
+    $('#formStatus').text('¡Validación correcta! Los datos pasaron todas las comprobaciones. No se enviaron a un servidor.').attr('class', 'form-status success');
+    this.reset();
+    $('#charCount').text('0 / 200');
+    camposOscar.concat(['terms']).forEach(idCampo => {
+      $('#' + idCampo).closest('.form-field').removeClass('invalid');
+      $('#err-' + idCampo).text('');
     });
-  }
-});
-
-$('#message').off('input.contador').on('input.contador', function () {
-  $('#charCount').text(`${this.value.length} / 200`);
-});
-
-// El formulario también limpia el evento submit previo para evitar duplicaciones.
-$(form).off('submit.validacion').on('submit.validacion', event => {
-  event.preventDefault();
-  const checks = fieldIds.map(validateField);
-  const firstInvalid = fieldIds.find((id, index) => !checks[index]);
-  if (firstInvalid) {
-    status.textContent = 'Revisa los campos marcados antes de continuar.';
-    status.className = 'form-status error';
-    document.getElementById(firstInvalid).focus();
-    return;
-  }
-  status.textContent = '¡Validación correcta! Los datos pasaron todas las comprobaciones. No se enviaron a un servidor.';
-  status.className = 'form-status success';
-  form.reset();
-  document.getElementById('charCount').textContent = '0 / 200';
-  fieldIds.forEach(id => {
-    const field = document.getElementById(id);
-    const wrapper = field.closest('.form-field');
-    if (wrapper) wrapper.classList.remove('invalid');
-    const error = document.getElementById(`err-${id}`);
-    if (error) error.textContent = '';
+    mostrarAvisoOscar('Formulario validado correctamente.');
   });
-  showToast('Formulario validado correctamente.');
-});
-
-function showToast(message) {
-  const toast = document.getElementById('toast');
-  toast.textContent = message;
-  toast.classList.add('show');
-  window.clearTimeout(showToast.timer);
-  showToast.timer = window.setTimeout(() => toast.classList.remove('show'), 2800);
+  $('#personalForm').attr('data-hidratado', 'true');
 }
 
+function hidratarInterfazOscar() {
+  const $contenedorMenu = $('#contenedorMenu');
+  if (!$contenedorMenu.length || $contenedorMenu.attr('data-hidratado') === 'true') return;
 
-// Galería de fotos: al tocar una imagen se abre en grande.
-const photoViewer = document.getElementById('photoViewer');
-const photoViewerImage = document.getElementById('photoViewerImage');
-const photoViewerCaption = document.getElementById('photoViewerCaption');
-const photoViewerClose = document.getElementById('photoViewerClose');
+  hidratarMenuSuperiorOscar();
+  hidratarNavegacionOscar();
+  hidratarAccesosDeInicioOscar();
+  hidratarGaleriaOscar();
+  hidratarFiltroTresCapasOscar();
+  hidratarBusquedasOscar();
+  hidratarSeleccionMusicalOscar();
+  hidratarFormularioOscar();
 
-function closePhotoViewer() {
-  if (!photoViewer) return;
-  photoViewer.classList.remove('open');
-  photoViewer.setAttribute('aria-hidden', 'true');
-  document.body.classList.remove('viewer-open');
-  photoViewerImage.src = '';
+  $contenedorMenu.attr('data-hidratado', 'true');
+  const botonesPendientes = document.querySelectorAll('button[data-hidratado="false"]');
+  if (botonesPendientes.length) {
+    console.error('Quedaron botones sin hidratar:', Array.from(botonesPendientes).map(boton => boton.id || boton.textContent.trim()));
+  } else {
+    console.info('Hidratación completada: ' + document.querySelectorAll('button[data-hidratado=\"true\"]').length + ' botones con eventos conectados.');
+  }
 }
 
-document.querySelectorAll('.photo-card[data-photo]').forEach(photoButton => {
-  photoButton.addEventListener('click', () => {
-    photoViewerImage.src = photoButton.dataset.photo;
-    photoViewerImage.alt = photoButton.querySelector('img')?.alt || 'Fotografía personal';
-    photoViewerCaption.textContent = photoButton.dataset.caption || '';
-    photoViewer.classList.add('open');
-    photoViewer.setAttribute('aria-hidden', 'false');
-    document.body.classList.add('viewer-open');
-  });
+// La vista HTML aparece primero; después de 500 ms JavaScript conecta los eventos al DOM existente.
+$(function () {
+  window.setTimeout(hidratarInterfazOscar, 500);
 });
 
-if (photoViewerClose) photoViewerClose.addEventListener('click', closePhotoViewer);
-if (photoViewer) photoViewer.addEventListener('click', event => {
-  if (event.target === photoViewer) closePhotoViewer();
-});
-document.addEventListener('keydown', event => {
-  if (event.key === 'Escape') closePhotoViewer();
-});
+// La primera pantalla se muestra sin esperar a los eventos; las interacciones se conectan en la hidratación.
+const vistaInicialOscar = (window.location.hash || '#inicio').replace('#', '');
+mostrarVistaOscar(vistasOscar.includes(vistaInicialOscar) ? vistaInicialOscar : 'inicio');
