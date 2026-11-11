@@ -198,7 +198,8 @@ async function programarSincronizacionRegistrosOscar() {
 
 function actualizarEstadoRedOscar(mostrarMensaje = false) {
   const enLinea = navigator.onLine;
-  const texto = enLinea ? 'PORTAFOLIO PERSONAL · EN LÍNEA' : 'MODO OFFLINE · DATOS LOCALES';
+  const texto = enLinea ? 'Online' : 'Offline';
+  $('#estadoRedEstado').toggleClass('is-online', enLinea).toggleClass('is-offline', !enLinea);
   $('#estadoRedTexto').text(texto);
   $('#estadoRedSidebar').text(enLinea ? 'Con conexión' : 'Modo offline · datos locales');
   const color = enLinea ? '#76d6a0' : '#f59b55';
@@ -260,8 +261,6 @@ function hidratarDelegacionEventosOscar() {
         const menuAbierto = $('#mobileMenu').is(':visible');
         $('#mobileMenu').stop(true, true).slideToggle(300);
         $(this).attr({ 'aria-expanded': String(!menuAbierto), 'aria-label': menuAbierto ? 'Abrir menú' : 'Cerrar menú' });
-      } else if (accion === 'actualizar-pagina') {
-        window.location.reload();
       } else if (accion === 'abrir-foto') {
         abrirFotoOscar(this);
       } else if (accion === 'cerrar-foto') {

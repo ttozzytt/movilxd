@@ -1026,24 +1026,55 @@ a.breadcrumb-home { display:inline-flex; align-items:center; text-decoration:non
 .home-feature-photo img { display:block !important; visibility:visible !important; opacity:1 !important; }
 
 
-/* Controles de cabecera: menú normal y actualización de página. */
-.refresh-page-btn {
-  display:inline-grid; place-items:center; width:34px; height:34px;
-  border:1px solid var(--line); border-radius:9px;
-  background:rgba(255,255,255,.04); color:#dce6eb;
-  font:600 20px/1 'Segoe UI',system-ui,sans-serif; cursor:pointer;
-  transition:background .2s,border-color .2s,transform .2s;
-}
-.refresh-page-btn:hover { background:rgba(255,139,69,.12); border-color:var(--orange); transform:rotate(35deg); }
-.refresh-page-btn:disabled { opacity:.55; cursor:wait; }
+/* Controles de cabecera: indicador de conexión y menú. */
 .mobile-menu-toggle { width:38px; min-width:38px; padding:0; font-size:17px; letter-spacing:0; }
 .mobile-menu-toggle:disabled { opacity:.55; cursor:wait; }
 @media(max-width:760px) {
   .top-actions { display:flex; align-items:center; gap:8px; }
-  .refresh-page-btn { width:32px; height:32px; font-size:18px; }
   .mobile-menu-toggle { display:grid; place-items:center; width:34px; min-width:34px; max-width:none; height:34px; padding:0; font-size:16px; overflow:visible; }
 }
 /* El estado de hidratación no cambia el diseño; solo el atributo permite revisarlo en el inspector. */
 button[data-hidratado="false"] { cursor:wait; }
 button[data-hidratado="true"] { cursor:pointer; }
 
+
+
+/* Indicador permanente de conexión: visible también en la cabecera móvil. */
+.connection-status {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  min-height:30px;
+  padding:6px 10px;
+  border:1px solid rgba(118,214,160,.22);
+  border-radius:999px;
+  background:rgba(118,214,160,.08);
+  color:#a6dfbb;
+  font:700 9px/1 'Segoe UI',system-ui,sans-serif;
+  letter-spacing:.5px;
+  white-space:nowrap;
+  flex:0 0 auto;
+}
+.connection-status i {
+  display:inline-block;
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:#76d6a0;
+  box-shadow:0 0 0 3px rgba(118,214,160,.12);
+  flex:0 0 7px;
+}
+.connection-status.is-offline {
+  border-color:rgba(245,155,85,.28);
+  background:rgba(245,155,85,.09);
+  color:#ffb47e;
+}
+.connection-status.is-offline i {
+  background:#f59b55;
+  box-shadow:0 0 0 3px rgba(245,155,85,.14);
+}
+@media(max-width:760px) {
+  .top-actions { gap:8px; }
+  .connection-status { min-height:29px; padding:6px 9px; font-size:9px; }
+}
