@@ -5,36 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="description" content="La presentación personal de Oscar Calle: sus fotos, skate, música, videojuegos y metas.">
   <title>Oscar Calle · Mi espacio</title>
-  <link rel="stylesheet" href="index.css?v=20261111-separado">
+  <link rel="stylesheet" href="index.css?v=20261111-seis-offline-v2">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%23ff8b45'/%3E%3Ctext x='50' y='65' font-size='50' text-anchor='middle' fill='%230d1820' font-family='Arial' font-weight='bold'%3EOC%3C/text%3E%3C/svg%3E">
-  <script>
-    // Retira versiones antiguas de caché que quedaron de pruebas anteriores.
-    (async function limpiarVersionAnterior() {
-      try {
-        if ('serviceWorker' in navigator) {
-          const registros = await navigator.serviceWorker.getRegistrations();
-          await Promise.all(registros.filter(r => new URL(r.scope).pathname.startsWith('/movilxd/')).map(r => r.unregister()));
-        }
-        if ('caches' in window) {
-          const nombres = await caches.keys();
-          await Promise.all(nombres.filter(n => /oscar|movilxd/i.test(n)).map(n => caches.delete(n)));
-        }
-      } catch (error) { console.log('Limpieza de caché anterior:', error); }
-    })();
-  </script>
-  <script src="index.js?v=20261111-separado" defer></script>
+<script src="index.js?v=20261111-seis-offline-v2" defer></script>
 </head>
 <body class="entry-body">
-  <main class="entry-page entry-page-gallery">
+  <main class="entry-page entry-page-gallery" data-hidratado="false">
     <section class="entry-card entry-card-photo">
       <div class="entry-photo entry-photo-mosaic" aria-label="Fotos personales de Oscar">
-        <button class="entry-main-shot entry-photo-action" type="button" data-foto-ampliar="imagenes/retrato-verde.webp" data-foto-descripcion="Retrato personal de Oscar" aria-label="Ampliar retrato personal">
+        <button class="entry-main-shot entry-photo-action" data-hidratado="false" disabled type="button" data-foto-ampliar="imagenes/retrato-verde.webp" data-foto-descripcion="Retrato personal de Oscar" aria-label="Ampliar retrato personal">
           <img src="imagenes/retrato-verde.webp" alt="Retrato personal de Oscar con tono verde">
           <span class="entry-photo-label">ASÍ SOY YO · OC</span>
         </button>
         <div class="entry-side-shots">
-          <button class="entry-side-shot entry-photo-action" type="button" data-foto-ampliar="imagenes/selfie-espejo.webp" data-foto-descripcion="Selfie frente al espejo" aria-label="Ampliar selfie frente al espejo"><img src="imagenes/selfie-espejo.webp" alt="Selfie de Oscar frente al espejo"></button>
-          <button class="entry-side-shot entry-photo-action" type="button" data-foto-ampliar="imagenes/retrato-blanco-negro.webp" data-foto-descripcion="Retrato en blanco y negro" aria-label="Ampliar retrato en blanco y negro"><img src="imagenes/retrato-blanco-negro.webp" alt="Retrato de Oscar en blanco y negro"></button>
+          <button class="entry-side-shot entry-photo-action" data-hidratado="false" disabled type="button" data-foto-ampliar="imagenes/selfie-espejo.webp" data-foto-descripcion="Selfie frente al espejo" aria-label="Ampliar selfie frente al espejo"><img src="imagenes/selfie-espejo.webp" alt="Selfie de Oscar frente al espejo"></button>
+          <button class="entry-side-shot entry-photo-action" data-hidratado="false" disabled type="button" data-foto-ampliar="imagenes/retrato-blanco-negro.webp" data-foto-descripcion="Retrato en blanco y negro" aria-label="Ampliar retrato en blanco y negro"><img src="imagenes/retrato-blanco-negro.webp" alt="Retrato de Oscar en blanco y negro"></button>
         </div>
       </div>
       <div class="entry-copy">
@@ -54,17 +39,17 @@
     <section class="entry-photo-preview" aria-label="Un vistazo a mis momentos">
       <div class="entry-preview-heading"><span class="eyebrow">ALGUNOS MOMENTOS</span><span>Toca una foto para ampliarla</span></div>
       <div class="entry-preview-grid">
-        <button class="entry-preview-photo" type="button" data-foto-ampliar="imagenes/skatepark.webp" data-foto-descripcion="Un rato practicando skate"><img src="imagenes/skatepark.webp" alt="Oscar con su skate en el parque"><span>Skate</span></button>
-        <button class="entry-preview-photo" type="button" data-foto-ampliar="imagenes/atardecer.webp" data-foto-descripcion="Atardeceres que vale la pena mirar"><img src="imagenes/atardecer.webp" alt="Atardecer entre árboles"><span>Atardeceres</span></button>
-        <button class="entry-preview-photo" type="button" data-foto-ampliar="imagenes/playa.webp" data-foto-descripcion="Un momento junto al mar"><img src="imagenes/playa.webp" alt="Oscar en la playa"><span>Salidas</span></button>
-        <button class="entry-preview-photo" type="button" data-foto-ampliar="imagenes/fogata.webp" data-foto-descripcion="Una noche alrededor del fuego"><img src="imagenes/fogata.webp" alt="Fogata al aire libre"><span>Momentos</span></button>
-        <button class="entry-preview-photo" type="button" data-foto-ampliar="imagenes/skate-detalle.webp" data-foto-descripcion="Mi skate"><img src="imagenes/skate-detalle.webp" alt="Mi skate en la calle"><span>Mi skate</span></button>
+        <button class="entry-preview-photo" data-hidratado="false" disabled type="button" data-foto-ampliar="imagenes/skatepark.webp" data-foto-descripcion="Un rato practicando skate"><img src="imagenes/skatepark.webp" alt="Oscar con su skate en el parque"><span>Skate</span></button>
+        <button class="entry-preview-photo" data-hidratado="false" disabled type="button" data-foto-ampliar="imagenes/atardecer.webp" data-foto-descripcion="Atardeceres que vale la pena mirar"><img src="imagenes/atardecer.webp" alt="Atardecer entre árboles"><span>Atardeceres</span></button>
+        <button class="entry-preview-photo" data-hidratado="false" disabled type="button" data-foto-ampliar="imagenes/playa.webp" data-foto-descripcion="Un momento junto al mar"><img src="imagenes/playa.webp" alt="Oscar en la playa"><span>Salidas</span></button>
+        <button class="entry-preview-photo" data-hidratado="false" disabled type="button" data-foto-ampliar="imagenes/fogata.webp" data-foto-descripcion="Una noche alrededor del fuego"><img src="imagenes/fogata.webp" alt="Fogata al aire libre"><span>Momentos</span></button>
+        <button class="entry-preview-photo" data-hidratado="false" disabled type="button" data-foto-ampliar="imagenes/skate-detalle.webp" data-foto-descripcion="Mi skate"><img src="imagenes/skate-detalle.webp" alt="Mi skate en la calle"><span>Mi skate</span></button>
       </div>
     </section>
     <p class="entry-footer-note">© 2026 Oscar Calle · Diseño Web II</p>
   </main>
   <div class="entry-lightbox" id="entryLightbox" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Fotografía ampliada">
-    <button class="entry-lightbox-close" id="entryLightboxClose" type="button" aria-label="Cerrar fotografía">×</button>
+    <button class="entry-lightbox-close" id="entryLightboxClose" data-hidratado="false" disabled type="button" aria-label="Cerrar fotografía">×</button>
     <figure><img id="entryLightboxImage" src="" alt=""><figcaption id="entryLightboxCaption"></figcaption></figure>
   </div>
 </body>

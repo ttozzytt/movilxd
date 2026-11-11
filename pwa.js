@@ -1,3 +1,120 @@
+/*
+ * El mismo pwa.js cumple dos funciones:
+ * 1) En el navegador ejecuta la aplicación jQuery.
+ * 2) En segundo plano funciona como Service Worker para el modo offline.
+ * Así se mantienen exactamente seis archivos de código, sin vendor ni sw.js adicional.
+ */
+(function iniciarProyectoOscar() {
+  const contextoServiceWorker =
+    typeof ServiceWorkerGlobalScope !== 'undefined' &&
+    self instanceof ServiceWorkerGlobalScope;
+
+  if (contextoServiceWorker) {
+    'use strict';
+    const CACHE_OSCAR = 'oscar-movilxd-seis-offline-v2';
+    const BASE_OSCAR = self.registration.scope;
+    const JQUERY_OSCAR = 'https://code.jquery.com/jquery-3.6.0.min.js';
+    const RECURSOS_OSCAR = [
+      './',
+      './index.html',
+      './index.css',
+      './index.js',
+      './pwa.html',
+      './pwa.css',
+      './pwa.js',
+      './imagenes/retrato-verde.webp',
+      './imagenes/retrato-blanco-negro.webp',
+      './imagenes/selfie-espejo.webp',
+      './imagenes/skate-detalle.webp',
+      './imagenes/skatepark.webp',
+      './imagenes/atardecer.webp',
+      './imagenes/playa.webp',
+      './imagenes/fogata.webp'
+    ];
+
+    self.addEventListener('install', event => {
+      event.waitUntil((async () => {
+        const cache = await caches.open(CACHE_OSCAR);
+        // Guardar los recursos propios del proyecto.
+        for (const ruta of RECURSOS_OSCAR) {
+          const url = new URL(ruta, BASE_OSCAR).href;
+          const respuesta = await fetch(new Request(url, { cache: 'reload' }));
+          if (!respuesta.ok) throw new Error('No se pudo guardar ' + ruta + ' (' + respuesta.status + ')');
+          await cache.put(url, respuesta);
+        }
+        // Guardar jQuery del CDN como respuesta opaca para que también esté disponible offline.
+        try {
+          const solicitudJQuery = new Request(JQUERY_OSCAR, { mode: 'no-cors', cache: 'reload' });
+          const respuestaJQuery = await fetch(solicitudJQuery);
+          if (respuestaJQuery.ok || respuestaJQuery.type === 'opaque') {
+            await cache.put(solicitudJQuery, respuestaJQuery);
+          }
+        } catch (error) {
+          console.warn('jQuery no pudo guardarse para offline; se intentará cargar online:', error);
+        }
+        await self.skipWaiting();
+      })());
+    });
+
+    self.addEventListener('activate', event => {
+      event.waitUntil((async () => {
+        const nombres = await caches.keys();
+        await Promise.all(nombres
+          .filter(nombre => nombre.startsWith('oscar-movilxd-') && nombre !== CACHE_OSCAR)
+          .map(nombre => caches.delete(nombre)));
+        await self.clients.claim();
+      })());
+    });
+
+    self.addEventListener('fetch', event => {
+      const solicitud = event.request;
+      if (solicitud.method !== 'GET') return;
+      const url = new URL(solicitud.url);
+      const esJQuery = url.href === JQUERY_OSCAR;
+      if (url.origin !== self.location.origin && !esJQuery) return;
+
+      if (solicitud.mode === 'navigate') {
+        event.respondWith((async () => {
+          try {
+            const respuesta = await fetch(solicitud);
+            if (respuesta && respuesta.ok) {
+              const cache = await caches.open(CACHE_OSCAR);
+              await cache.put(solicitud, respuesta.clone());
+            }
+            return respuesta;
+          } catch (error) {
+            const cache = await caches.open(CACHE_OSCAR);
+            const guardada = await cache.match(solicitud, { ignoreSearch: true, ignoreVary: true });
+            if (guardada) return guardada;
+            const destino = url.pathname.endsWith('/pwa.html') ? 'pwa.html' : 'index.html';
+            return (await cache.match(new URL(destino, BASE_OSCAR).href)) ||
+              new Response('Abre esta página una vez con Internet para guardarla y usarla offline.', {
+                status: 503, headers: { 'Content-Type': 'text/plain; charset=utf-8' }
+              });
+          }
+        })());
+        return;
+      }
+
+      event.respondWith((async () => {
+        const cache = await caches.open(CACHE_OSCAR);
+        const guardada = await cache.match(solicitud, { ignoreSearch: true, ignoreVary: true });
+        if (guardada) return guardada;
+        try {
+          const respuesta = await fetch(solicitud);
+          if (respuesta && (respuesta.ok || respuesta.type === 'opaque')) {
+            await cache.put(solicitud, respuesta.clone());
+          }
+          return respuesta;
+        } catch (error) {
+          return new Response('', { status: 504, statusText: 'Recurso no disponible offline' });
+        }
+      })());
+    });
+    return;
+  }
+
+  // ===== Código normal de la aplicación web (solo contexto de navegador) =====
 'use strict';
 
 // Vistas que existen en pwa.html.
@@ -331,20 +448,51 @@ $(function () {
   mostrarVistaOscar(vistasOscar.includes(vistaInicial) ? vistaInicial : 'inicio');
 });
 
-// Limpieza de listeners y temporizador al abandonar la página.
+// Limpieza de temporizadores al salir. Los listeners delegados se registran
+// con .off() antes de .on(); no se eliminan aquí para no romper el regreso desde bfcache.
 $(window)
   .off('pagehide.oscarLimpieza')
   .on('pagehide.oscarLimpieza', function () {
     window.clearTimeout(temporizadorHidratacionOscar);
-    [
-      '.oscarNavegacion', '.oscarAcciones', '.oscarCerrarVisor',
-      '.oscarArea', '.oscarModulo', '.oscarBusquedaMusica',
-      '.oscarBusquedaJuegos', '.oscarGenero', '.oscarArtista',
-      '.oscarValidacion', '.oscarTerminos', '.oscarFormulario'
-    ].forEach(namespace => $(document).off(namespace));
-    $(window).off('keydown.oscarCerrarVisor');
-    $(window).off('pagehide.oscarLimpieza');
     window.clearTimeout(temporizadorAvisoOscar);
   });
 
+// Si el navegador restaura la página desde bfcache antes de hidratarla,
+// vuelve a programar la hidratación pendiente una sola vez.
+$(window)
+  .off('pageshow.oscarRehidratar')
+  .on('pageshow.oscarRehidratar', function (event) {
+    const $contenedor = $('#contenedorMenu');
+    if (event.originalEvent && event.originalEvent.persisted && $contenedor.attr('data-hidratado') !== 'true') {
+      window.clearTimeout(temporizadorHidratacionOscar);
+      temporizadorHidratacionOscar = window.setTimeout(hidratarInterfazOscar, 500);
+    }
+  });
 
+
+// Registra el mismo Service Worker cuando se abre pwa.html directamente.
+(function registrarOfflineOscar() {
+  if (!('serviceWorker' in navigator) || location.protocol !== 'https:') return;
+  (async () => {
+    try {
+      const registros = await navigator.serviceWorker.getRegistrations();
+      const anteriores = registros.filter(registro => {
+        const trabajador = registro.active || registro.waiting || registro.installing;
+        return trabajador && new URL(trabajador.scriptURL).pathname.endsWith('/sw.js');
+      });
+      if (anteriores.length) {
+        await Promise.all(anteriores.map(registro => registro.unregister()));
+        const nombresCache = await caches.keys();
+        await Promise.all(nombresCache.filter(nombre => /oscar|movilxd/i.test(nombre)).map(nombre => caches.delete(nombre)));
+      }
+      const registro = await navigator.serviceWorker.register('./pwa.js?worker=oscar-offline-v2', {
+        scope: './', updateViaCache: 'none'
+      });
+      console.info('Almacenamiento offline registrado:', registro.scope);
+    } catch (error) {
+      console.warn('No se pudo activar el modo offline:', error);
+    }
+  })();
+})();
+
+})();
