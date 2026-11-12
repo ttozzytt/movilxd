@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#f97316">
 <meta content="Conoce a Oscar Calle: estudiante de Ingeniería en Sistemas, fan del skate, el rap y los videojuegos." name="description"/>
 <title>Oscar Calle · Mi espacio</title>
-<link href="pwa.css?v=20261112-online-check-v9" rel="stylesheet"/>
+<link href="pwa.css?v=20261112-internet-check-v10" rel="stylesheet"/>
 <link href="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%23ff8b45%22/&gt;&lt;text x=%2250%25%22 y=%2265%25%22 font-size=%2250%22 text-anchor=%22middle%22 fill=%22%230d1820%22 font-family=%22Arial%22 font-weight=%22bold%22&gt;OC&lt;/text&gt;&lt;/svg&gt;" rel="icon"/>  <link rel="manifest" href="manifest.json">
 </head>
 <body>
@@ -58,19 +58,21 @@
   const sidebarDot = document.getElementById('estadoRedPunto');
   if (!status || !text) return;
 
+  const destinos = [
+    'https://www.gstatic.com/generate_204',
+    'https://www.cloudflare.com/cdn-cgi/trace',
+    'https://www.msftconnecttest.com/connecttest.txt'
+  ];
   let estadoConfirmado = null;
   let enCurso = false;
   let temporizador = null;
-  let temporizadorCambio = null;
-  let controlador = null;
+  let controladores = [];
   let revision = 0;
-  let secuencia = 0;
 
   function pintar(enLinea, verificado, notificar) {
     const cambio = estadoConfirmado !== enLinea;
     estadoConfirmado = enLinea;
     window.__OSCAR_PWA_ONLINE__ = enLinea;
-
     status.classList.toggle('is-online', enLinea);
     status.classList.toggle('is-offline', !enLinea);
     status.classList.remove('is-checking');
@@ -90,78 +92,83 @@
     }
   }
 
-  // Primera respuesta visual inmediata; el resultado de la petición real la corrige.
-  pintar(navigator.onLine !== false, false, false);
+  function programarSiguiente() {
+    window.clearTimeout(temporizador);
+    temporizador = window.setTimeout(comprobar, estadoConfirmado ? 15000 : 5000);
+  }
 
   async function comprobar(notificar = false) {
     if (enCurso || document.visibilityState === 'hidden') return;
     enCurso = true;
     const revisionActual = ++revision;
-    const control = new AbortController();
-    controlador = control;
-    const limite = window.setTimeout(() => control.abort(), 4500);
+    controladores = destinos.map(() => new AbortController());
+
+    const pruebas = destinos.map((destino, indice) => {
+      const controlador = controladores[indice];
+      const limite = window.setTimeout(() => controlador.abort(), 3500);
+      const url = new URL(destino);
+      url.searchParams.set('_oscar_ping', `${Date.now()}-${revisionActual}-${indice}`);
+      return fetch(url.href, {
+        method: 'GET',
+        mode: 'no-cors',
+        cache: 'no-store',
+        credentials: 'omit',
+        redirect: 'follow',
+        referrerPolicy: 'no-referrer',
+        signal: controlador.signal
+      }).then(respuesta => {
+        if (respuesta.redirected) throw new Error('La conexión fue redirigida a un portal.');
+        if (respuesta.type === 'opaque' || respuesta.ok) return true;
+        throw new Error('El destino de conectividad no respondió correctamente.');
+      }).finally(() => window.clearTimeout(limite));
+    });
 
     try {
-      const destino = new URL('./manifest.json', document.baseURI || window.location.href);
-      destino.searchParams.set('__connection_check', `${Date.now()}-${++secuencia}`);
-      const respuesta = await fetch(destino.href, {
-        method: 'GET',
-        cache: 'no-store',
-        credentials: 'same-origin',
-        redirect: 'follow',
-        signal: control.signal
-      });
-      if (revisionActual === revision) pintar(respuesta.ok, true, notificar);
+      await Promise.any(pruebas);
+      if (revisionActual === revision) pintar(true, true, notificar);
     } catch (error) {
       if (revisionActual === revision) pintar(false, true, notificar);
     } finally {
-      window.clearTimeout(limite);
+      controladores.forEach(controlador => controlador.abort());
       if (revisionActual === revision) {
-        controlador = null;
+        controladores = [];
         enCurso = false;
+        programarSiguiente();
       }
     }
   }
 
-  function reiniciarComprobacion(notificar = true) {
-    window.clearTimeout(temporizadorCambio);
+  function reiniciar(notificar = true) {
+    window.clearTimeout(temporizador);
     revision++;
-    if (controlador) controlador.abort();
-    controlador = null;
+    controladores.forEach(controlador => controlador.abort());
+    controladores = [];
     enCurso = false;
-    temporizadorCambio = window.setTimeout(() => comprobar(notificar), 350);
+    comprobar(notificar);
   }
 
   function detener() {
-    window.clearInterval(temporizador);
-    temporizador = null;
-    window.clearTimeout(temporizadorCambio);
+    window.clearTimeout(temporizador);
     revision++;
-    if (controlador) controlador.abort();
-    controlador = null;
+    controladores.forEach(controlador => controlador.abort());
+    controladores = [];
     enCurso = false;
   }
 
-  function iniciar() {
-    detener();
-    if (document.visibilityState === 'hidden') return;
-    comprobar(false);
-    temporizador = window.setInterval(() => comprobar(false), 20000);
-  }
-
-  window.addEventListener('online', () => reiniciarComprobacion(true));
-  window.addEventListener('offline', () => reiniciarComprobacion(true));
-  window.addEventListener('pageshow', () => iniciar());
+  window.addEventListener('online', () => reiniciar(true));
+  window.addEventListener('offline', () => reiniciar(true));
+  window.addEventListener('pageshow', () => reiniciar(false));
   window.addEventListener('pagehide', detener);
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden') detener();
-    else iniciar();
+    else reiniciar(false);
   });
 
+  text.textContent = 'Comprobando...';
+  status.classList.add('is-checking');
+  status.classList.remove('is-online', 'is-offline');
+  if (sidebarText) sidebarText.textContent = 'Comprobando conexión...';
   comprobar(false);
-  temporizador = window.setInterval(() => {
-    if (document.visibilityState === 'visible') comprobar(false);
-  }, 20000);
 })();
 </script>
 <nav aria-label="Menú desplegable" class="mobile-menu" id="mobileMenu">
@@ -396,6 +403,6 @@
 </div>
 <div aria-live="polite" class="toast" id="toast" role="status"></div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js" defer></script>
-<script src="pwa.js?v=20261112-online-check-v9" defer></script>
+<script src="pwa.js?v=20261112-internet-check-v10" defer></script>
 </body>
 </html>

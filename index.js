@@ -70,17 +70,23 @@
   });
 })();
 
-// Estado de conexión real en portada: verifica el acceso al sitio, no solo la red local.
-(function detectarEstadoRedPortadaOscar() {
+// Detector de Internet real para la portada.
+// La prueba usa destinos externos y no consulta Cache Storage ni navigator.onLine.
+(function detectarInternetPortadaOscar() {
   const indicador = document.getElementById('estadoRedPortada');
   const texto = document.getElementById('estadoRedPortadaTexto');
   if (!indicador || !texto) return;
 
+  const destinos = [
+    'https://www.gstatic.com/generate_204',
+    'https://www.cloudflare.com/cdn-cgi/trace',
+    'https://www.msftconnecttest.com/connecttest.txt'
+  ];
   let estadoConfirmado = null;
   let enCurso = false;
-  let temporizador = null;
-  let controladorActual = null;
   let revision = 0;
+  let controladores = [];
+  let temporizador = null;
 
   function pintar(enLinea) {
     estadoConfirmado = enLinea;
@@ -90,105 +96,87 @@
     texto.textContent = enLinea ? 'Online' : 'Offline';
   }
 
-  async function comprobar() {
-    // navigator.onLine solo es una pista del navegador. La decisión final
-    // depende de que el recurso del mismo sitio responda por la red.
-    if (enCurso) return estadoConfirmado === true;
+  function programarSiguiente() {
+    window.clearTimeout(temporizador);
+    // Reintenta más seguido cuando está Offline para detectar la vuelta de Wi-Fi/datos.
+    temporizador = window.setTimeout(comprobar, estadoConfirmado ? 15000 : 5000);
+  }
 
+  async function comprobar() {
+    if (enCurso || document.visibilityState === 'hidden') return;
     enCurso = true;
     const revisionActual = ++revision;
-    const controlador = new AbortController();
-    controladorActual = controlador;
-    const limite = window.setTimeout(() => controlador.abort(), 8000);
+    controladores = destinos.map(() => new AbortController());
+
+    const pruebas = destinos.map((destino, indice) => {
+      const controlador = controladores[indice];
+      const limite = window.setTimeout(() => controlador.abort(), 3500);
+      const url = new URL(destino);
+      url.searchParams.set('_oscar_ping', `${Date.now()}-${revisionActual}-${indice}`);
+      return fetch(url.href, {
+        method: 'GET',
+        mode: 'no-cors',
+        cache: 'no-store',
+        credentials: 'omit',
+        redirect: 'follow',
+        referrerPolicy: 'no-referrer',
+        signal: controlador.signal
+      }).then(respuesta => {
+        // En no-cors la respuesta normal es opaca; que fetch resuelva sin redirección
+        // demuestra que hubo respuesta de Internet. Un portal cautivo redirigido no cuenta.
+        if (respuesta.redirected) throw new Error('La conexión fue redirigida a un portal.');
+        if (respuesta.type === 'opaque' || respuesta.ok) return true;
+        throw new Error('El destino de conectividad no respondió correctamente.');
+      }).finally(() => window.clearTimeout(limite));
+    });
 
     try {
-      const destino = new URL('./manifest.json', document.baseURI || window.location.href);
-      destino.searchParams.set('__connection_check', String(Date.now()));
-      let respuesta = null;
-      try {
-        respuesta = await fetch(destino.href, {
-          method: 'HEAD',
-          cache: 'no-store',
-          credentials: 'same-origin',
-          redirect: 'follow',
-          signal: controlador.signal
-        });
-      } catch (errorHead) {
-        if (controlador.signal.aborted) throw errorHead;
-        // Un navegador o servidor puede rechazar HEAD aunque GET esté disponible.
-      }
-
-      // Si HEAD no está soportado o falla por el método, se prueba GET en la red.
-      if (!respuesta || !respuesta.ok) {
-        respuesta = await fetch(destino.href, {
-          method: 'GET',
-          cache: 'no-store',
-          credentials: 'same-origin',
-          redirect: 'follow',
-          signal: controlador.signal
-        });
-      }
-
-      const enLinea = revisionActual === revision && respuesta.ok;
-      if (revisionActual === revision) pintar(enLinea);
-      return enLinea;
+      await Promise.any(pruebas);
+      if (revisionActual === revision) pintar(true);
     } catch (error) {
       if (revisionActual === revision) pintar(false);
-      return false;
     } finally {
-      window.clearTimeout(limite);
+      controladores.forEach(controlador => controlador.abort());
       if (revisionActual === revision) {
-        controladorActual = null;
+        controladores = [];
         enCurso = false;
+        programarSiguiente();
       }
     }
   }
 
-  function detener() {
-    window.clearInterval(temporizador);
-    temporizador = null;
+  function reiniciar() {
+    window.clearTimeout(temporizador);
     revision++;
-    if (controladorActual) controladorActual.abort();
-    controladorActual = null;
+    controladores.forEach(controlador => controlador.abort());
+    controladores = [];
     enCurso = false;
-  }
-
-  function iniciar() {
-    window.clearInterval(temporizador);
-    temporizador = null;
-    if (document.visibilityState === 'hidden') return;
     comprobar();
-    temporizador = window.setInterval(() => {
-      if (document.visibilityState === 'visible') comprobar();
-    }, 20000);
   }
 
-  function alCambiarIndicadorDelNavegador() {
-    // online/offline provoca una comprobación nueva; no fija el estado por sí solo.
+  function detener() {
+    window.clearTimeout(temporizador);
     revision++;
-    if (controladorActual) controladorActual.abort();
-    controladorActual = null;
+    controladores.forEach(controlador => controlador.abort());
+    controladores = [];
     enCurso = false;
-    iniciar();
   }
 
-  function controlarVisibilidad() {
-    if (document.visibilityState === 'hidden') detener();
-    else iniciar();
-  }
-
-  window.removeEventListener('online', alCambiarIndicadorDelNavegador);
-  window.removeEventListener('offline', alCambiarIndicadorDelNavegador);
-  window.removeEventListener('pagehide', detener);
-  window.removeEventListener('pageshow', iniciar);
-  document.removeEventListener('visibilitychange', controlarVisibilidad);
-  window.addEventListener('online', alCambiarIndicadorDelNavegador);
-  window.addEventListener('offline', alCambiarIndicadorDelNavegador);
+  window.addEventListener('online', reiniciar);
+  window.addEventListener('offline', reiniciar);
+  window.addEventListener('pageshow', reiniciar);
   window.addEventListener('pagehide', detener);
-  window.addEventListener('pageshow', iniciar);
-  document.addEventListener('visibilitychange', controlarVisibilidad);
-  iniciar();
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') detener();
+    else reiniciar();
+  });
+
+  texto.textContent = 'Comprobando...';
+  indicador.classList.add('is-checking');
+  indicador.classList.remove('is-online', 'is-offline');
+  comprobar();
 })();
+
 
 // Registro del Service Worker estándar indicado por la guía PWA Offline-First.
 (function registrarOfflineOscar() {

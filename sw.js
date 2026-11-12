@@ -5,7 +5,7 @@
  */
 'use strict';
 
-const CACHE_OSCAR = 'oscar-movilxd-offline-first-v9';
+const CACHE_OSCAR = 'oscar-movilxd-offline-first-v10';
 const RUTA_BASE_OSCAR = self.registration.scope;
 const JQUERY_OSCAR = 'https://code.jquery.com/jquery-3.6.0.min.js';
 const RECURSOS_OSCAR = [
@@ -93,11 +93,9 @@ self.addEventListener('fetch', event => {
   if (solicitud.method !== 'GET') return;
 
   const url = new URL(solicitud.url);
-  // Las comprobaciones de conexión deben llegar siempre a la red, nunca a Cache Storage.
-  if (url.searchParams.has('__connection_check')) {
-    event.respondWith(fetch(solicitud, { cache: 'no-store' }));
-    return;
-  }
+  // Las pruebas de Internet V10 usan destinos externos. Este SW nunca los cachea ni los intercepta.
+  // Las rutas locales con el parámetro de prueba también se dejan pasar directamente a la red.
+  if (url.searchParams.has('__connection_check')) return;
   const esMismoOrigen = url.origin === self.location.origin;
   const esJQuery = url.href === JQUERY_OSCAR;
   if (!esMismoOrigen && !esJQuery) return;
