@@ -5,7 +5,7 @@
  */
 'use strict';
 
-const CACHE_OSCAR = 'oscar-movilxd-offline-first-v6';
+const CACHE_OSCAR = 'oscar-movilxd-offline-first-v8';
 const RUTA_BASE_OSCAR = self.registration.scope;
 const JQUERY_OSCAR = 'https://code.jquery.com/jquery-3.6.0.min.js';
 const RECURSOS_OSCAR = [
@@ -93,8 +93,8 @@ self.addEventListener('fetch', event => {
   if (solicitud.method !== 'GET') return;
 
   const url = new URL(solicitud.url);
-  // La prueba de Internet debe ir a la red; si se respondiera desde caché,
-  // indicaría Online incluso cuando el dispositivo ya perdió conexión.
+  // La comprobación de conexión usa HEAD (no interceptado aquí) y, como respaldo,
+  // un GET con este parámetro que debe ir directamente a la red, nunca a caché.
   if (url.searchParams.has('__connection_check')) return;
   const esMismoOrigen = url.origin === self.location.origin;
   const esJQuery = url.href === JQUERY_OSCAR;

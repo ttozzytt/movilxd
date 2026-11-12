@@ -118,3 +118,19 @@ button { font:inherit; cursor:pointer; }
 @media(max-width:390px) {
   .entry-footer-note { align-items:flex-start; flex-direction:column; gap:8px; }
 }
+
+
+/* En PC, la portada usa el mismo marco centrado y adaptable de la guía. */
+@media (min-width:1025px) {
+  .entry-page-gallery { width:min(768px,100%); }
+}
+
+.entry-connection-status.is-checking {
+  border-color:rgba(160,177,190,.24);
+  background:rgba(160,177,190,.08);
+  color:#b5c2cb;
+}
+.entry-connection-status.is-checking i {
+  background:#94a3ad;
+  box-shadow:0 0 0 3px rgba(148,163,173,.12);
+}

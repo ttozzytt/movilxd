@@ -75,44 +75,87 @@
   const indicador = document.getElementById('estadoRedPortada');
   const texto = document.getElementById('estadoRedPortadaTexto');
   if (!indicador || !texto) return;
+
   let estadoConfirmado = null;
   let enCurso = false;
   let temporizador = null;
+  let controladorActual = null;
+  let revision = 0;
 
   function pintar(enLinea) {
     estadoConfirmado = enLinea;
     indicador.classList.toggle('is-online', enLinea);
     indicador.classList.toggle('is-offline', !enLinea);
+    indicador.classList.remove('is-checking');
     texto.textContent = enLinea ? 'Online' : 'Offline';
   }
 
   async function comprobar() {
-    if (!navigator.onLine) { pintar(false); return false; }
+    // navigator.onLine solo es una pista del navegador. La decisión final
+    // depende de que el recurso del mismo sitio responda por la red.
     if (enCurso) return estadoConfirmado === true;
+
     enCurso = true;
+    const revisionActual = ++revision;
     const controlador = new AbortController();
-    const limite = window.setTimeout(() => controlador.abort(), 5000);
+    controladorActual = controlador;
+    const limite = window.setTimeout(() => controlador.abort(), 8000);
+
     try {
-      const destino = new URL('./index.html', window.location.href);
+      const destino = new URL('./manifest.json', document.baseURI || window.location.href);
       destino.searchParams.set('__connection_check', String(Date.now()));
-      const respuesta = await fetch(destino.href, {
-        method: 'GET', cache: 'no-store', credentials: 'same-origin', redirect: 'follow',
-        headers: { 'Cache-Control': 'no-cache' }, signal: controlador.signal
-      });
-      pintar(navigator.onLine && respuesta.ok);
-      return estadoConfirmado;
+      let respuesta = null;
+      try {
+        respuesta = await fetch(destino.href, {
+          method: 'HEAD',
+          cache: 'no-store',
+          credentials: 'same-origin',
+          redirect: 'follow',
+          signal: controlador.signal
+        });
+      } catch (errorHead) {
+        if (controlador.signal.aborted) throw errorHead;
+        // Un navegador o servidor puede rechazar HEAD aunque GET esté disponible.
+      }
+
+      // Si HEAD no está soportado o falla por el método, se prueba GET en la red.
+      if (!respuesta || !respuesta.ok) {
+        respuesta = await fetch(destino.href, {
+          method: 'GET',
+          cache: 'no-store',
+          credentials: 'same-origin',
+          redirect: 'follow',
+          signal: controlador.signal
+        });
+      }
+
+      const enLinea = revisionActual === revision && respuesta.ok;
+      if (revisionActual === revision) pintar(enLinea);
+      return enLinea;
     } catch (error) {
-      pintar(false);
+      if (revisionActual === revision) pintar(false);
       return false;
     } finally {
       window.clearTimeout(limite);
-      enCurso = false;
+      if (revisionActual === revision) {
+        controladorActual = null;
+        enCurso = false;
+      }
     }
   }
 
-  function detener() { window.clearInterval(temporizador); temporizador = null; }
+  function detener() {
+    window.clearInterval(temporizador);
+    temporizador = null;
+    revision++;
+    if (controladorActual) controladorActual.abort();
+    controladorActual = null;
+    enCurso = false;
+  }
+
   function iniciar() {
-    detener();
+    window.clearInterval(temporizador);
+    temporizador = null;
     if (document.visibilityState === 'hidden') return;
     comprobar();
     temporizador = window.setInterval(() => {
@@ -120,22 +163,30 @@
     }, 20000);
   }
 
-  function pintarOffline() { pintar(false); }
+  function alCambiarIndicadorDelNavegador() {
+    // online/offline provoca una comprobación nueva; no fija el estado por sí solo.
+    revision++;
+    if (controladorActual) controladorActual.abort();
+    controladorActual = null;
+    enCurso = false;
+    iniciar();
+  }
+
   function controlarVisibilidad() {
     if (document.visibilityState === 'hidden') detener();
     else iniciar();
   }
-  // Evita acumular listeners si la inicialización vuelve a ejecutarse.
-  window.removeEventListener('online', iniciar);
-  window.removeEventListener('offline', pintarOffline);
-  document.removeEventListener('visibilitychange', controlarVisibilidad);
+
+  window.removeEventListener('online', alCambiarIndicadorDelNavegador);
+  window.removeEventListener('offline', alCambiarIndicadorDelNavegador);
   window.removeEventListener('pagehide', detener);
   window.removeEventListener('pageshow', iniciar);
-  window.addEventListener('online', iniciar);
-  window.addEventListener('offline', pintarOffline);
-  document.addEventListener('visibilitychange', controlarVisibilidad);
+  document.removeEventListener('visibilitychange', controlarVisibilidad);
+  window.addEventListener('online', alCambiarIndicadorDelNavegador);
+  window.addEventListener('offline', alCambiarIndicadorDelNavegador);
   window.addEventListener('pagehide', detener);
   window.addEventListener('pageshow', iniciar);
+  document.addEventListener('visibilitychange', controlarVisibilidad);
   iniciar();
 })();
 

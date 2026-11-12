@@ -199,86 +199,163 @@ async function programarSincronizacionRegistrosOscar() {
 let estadoRedConfirmadoOscar = null;
 let comprobacionRedEnCursoOscar = false;
 let temporizadorEstadoRedOscar = null;
+let controladorEstadoRedOscar = null;
+let revisionEstadoRedOscar = 0;
 
 function actualizarEstadoRedOscar(enLinea, mostrarMensaje = false) {
   const cambioEstado = estadoRedConfirmadoOscar !== enLinea;
   estadoRedConfirmadoOscar = enLinea;
-  $('#estadoRedEstado').toggleClass('is-online', enLinea).toggleClass('is-offline', !enLinea);
-  $('#estadoRedTexto').text(enLinea ? 'Online' : 'Offline');
-  $('#estadoRedSidebar').text(enLinea ? 'Con conexión a Internet' : 'Modo offline · datos locales');
+
+  const estado = document.getElementById('estadoRedEstado');
+  const texto = document.getElementById('estadoRedTexto');
+  const textoSidebar = document.getElementById('estadoRedSidebar');
+  const indicador = document.getElementById('estadoRedIndicador');
+  const punto = document.getElementById('estadoRedPunto');
+
+  if (estado) {
+    estado.classList.toggle('is-online', enLinea);
+    estado.classList.toggle('is-offline', !enLinea);
+    estado.classList.remove('is-checking');
+  }
+  if (texto) texto.textContent = enLinea ? 'Online' : 'Offline';
+  if (textoSidebar) textoSidebar.textContent = enLinea ? 'Con conexión a Internet' : 'Modo offline · datos locales';
+
   const color = enLinea ? '#76d6a0' : '#f59b55';
-  $('#estadoRedIndicador, #estadoRedPunto').css({ background: color, boxShadow: `0 0 0 4px ${enLinea ? 'rgba(118,214,160,.1)' : 'rgba(245,155,85,.14)'}` });
+  [indicador, punto].filter(Boolean).forEach(elemento => {
+    elemento.style.background = color;
+    elemento.style.boxShadow = `0 0 0 4px ${enLinea ? 'rgba(118,214,160,.1)' : 'rgba(245,155,85,.14)'}`;
+  });
 
   if (!mostrarMensaje || !cambioEstado) return;
+  const avisar = mensaje => {
+    if (typeof mostrarAvisoOscar === 'function' && window.jQuery) {
+      try { mostrarAvisoOscar(mensaje); } catch (error) { console.warn('No se pudo mostrar el aviso de conexión:', error); }
+    }
+  };
   if (!enLinea) {
-    mostrarAvisoOscar('Sin acceso a Internet. La página y sus recursos guardados siguen disponibles.');
+    avisar('Sin acceso a Internet. La página y sus recursos guardados siguen disponibles.');
     return;
   }
   contarRegistrosPendientesOscar().then(cantidad => {
     if (cantidad > 0) {
       programarSincronizacionRegistrosOscar();
-      mostrarAvisoOscar(`Internet recuperado. Hay ${cantidad} registro(s) local(es) pendiente(s); falta configurar un servidor para enviarlos.`);
+      avisar(`Internet recuperado. Hay ${cantidad} registro(s) local(es) pendiente(s); falta configurar un servidor para enviarlos.`);
     } else {
-      mostrarAvisoOscar('Conexión a Internet recuperada. La aplicación está en línea.');
+      avisar('Conexión a Internet recuperada. La aplicación está en línea.');
     }
-  }).catch(() => mostrarAvisoOscar('Conexión a Internet recuperada.'));
+  }).catch(() => avisar('Conexión a Internet recuperada.'));
 }
 
 async function comprobarConexionRealOscar(mostrarMensaje = false) {
-  if (!navigator.onLine) {
-    actualizarEstadoRedOscar(false, mostrarMensaje);
-    return false;
-  }
+  // navigator.onLine es orientativo; la respuesta de red del propio sitio manda.
   if (comprobacionRedEnCursoOscar) return estadoRedConfirmadoOscar === true;
+
   comprobacionRedEnCursoOscar = true;
+  const revisionActual = ++revisionEstadoRedOscar;
   const controlador = new AbortController();
-  const limite = window.setTimeout(() => controlador.abort(), 5000);
+  controladorEstadoRedOscar = controlador;
+  const limite = window.setTimeout(() => controlador.abort(), 8000);
+
   try {
-    const destino = new URL('./index.html', window.location.href);
+    const destino = new URL('./manifest.json', document.baseURI || window.location.href);
     destino.searchParams.set('__connection_check', String(Date.now()));
-    const respuesta = await fetch(destino.href, {
-      method: 'GET', cache: 'no-store', credentials: 'same-origin', redirect: 'follow',
-      headers: { 'Cache-Control': 'no-cache' }, signal: controlador.signal
-    });
-    const enLinea = navigator.onLine && respuesta.ok;
-    actualizarEstadoRedOscar(enLinea, mostrarMensaje);
+    let respuesta = null;
+    try {
+      respuesta = await fetch(destino.href, {
+        method: 'HEAD',
+        cache: 'no-store',
+        credentials: 'same-origin',
+        redirect: 'follow',
+        signal: controlador.signal
+      });
+    } catch (errorHead) {
+      if (controlador.signal.aborted) throw errorHead;
+      // Un navegador o servidor puede rechazar HEAD aunque GET esté disponible.
+    }
+
+    // Si HEAD no está soportado o falla por el método, se prueba GET en la red.
+    if (!respuesta || !respuesta.ok) {
+      respuesta = await fetch(destino.href, {
+        method: 'GET',
+        cache: 'no-store',
+        credentials: 'same-origin',
+        redirect: 'follow',
+        signal: controlador.signal
+      });
+    }
+
+    const enLinea = revisionActual === revisionEstadoRedOscar && respuesta.ok;
+    if (revisionActual === revisionEstadoRedOscar) actualizarEstadoRedOscar(enLinea, mostrarMensaje);
     return enLinea;
   } catch (error) {
-    actualizarEstadoRedOscar(false, mostrarMensaje);
+    if (revisionActual === revisionEstadoRedOscar) actualizarEstadoRedOscar(false, mostrarMensaje);
     return false;
   } finally {
     window.clearTimeout(limite);
-    comprobacionRedEnCursoOscar = false;
+    if (revisionActual === revisionEstadoRedOscar) {
+      controladorEstadoRedOscar = null;
+      comprobacionRedEnCursoOscar = false;
+    }
   }
 }
 
 function detenerMonitoreoRedOscar() {
   window.clearInterval(temporizadorEstadoRedOscar);
   temporizadorEstadoRedOscar = null;
+  revisionEstadoRedOscar++;
+  if (controladorEstadoRedOscar) controladorEstadoRedOscar.abort();
+  controladorEstadoRedOscar = null;
+  comprobacionRedEnCursoOscar = false;
 }
 
-function iniciarMonitoreoRedOscar() {
-  detenerMonitoreoRedOscar();
+function iniciarMonitoreoRedOscar(mostrarMensaje = false) {
+  window.clearInterval(temporizadorEstadoRedOscar);
+  temporizadorEstadoRedOscar = null;
   if (document.visibilityState === 'hidden') return;
-  comprobarConexionRealOscar(false);
+  comprobarConexionRealOscar(mostrarMensaje);
   temporizadorEstadoRedOscar = window.setInterval(() => {
     if (document.visibilityState === 'visible') comprobarConexionRealOscar(false);
   }, 20000);
 }
 
+function alCambiarIndicadorDelNavegadorOscar() {
+  // El evento del navegador no decide Online/Offline; fuerza una prueba real.
+  revisionEstadoRedOscar++;
+  if (controladorEstadoRedOscar) controladorEstadoRedOscar.abort();
+  controladorEstadoRedOscar = null;
+  comprobacionRedEnCursoOscar = false;
+  iniciarMonitoreoRedOscar(true);
+}
+
+function controlarVisibilidadRedOscar() {
+  if (document.visibilityState === 'hidden') detenerMonitoreoRedOscar();
+  else iniciarMonitoreoRedOscar();
+}
+
 function hidratarDetectorRedOscar() {
-  $(window)
-    .off('online.oscarRed offline.oscarRed')
-    .on('online.oscarRed', () => comprobarConexionRealOscar(true))
-    .on('offline.oscarRed', () => actualizarEstadoRedOscar(false, true));
-  $(document)
-    .off('visibilitychange.oscarRed')
-    .on('visibilitychange.oscarRed', () => {
-      if (document.visibilityState === 'hidden') detenerMonitoreoRedOscar();
-      else iniciarMonitoreoRedOscar();
-    });
+  window.removeEventListener('online', alCambiarIndicadorDelNavegadorOscar);
+  window.removeEventListener('offline', alCambiarIndicadorDelNavegadorOscar);
+  window.removeEventListener('pagehide', detenerMonitoreoRedOscar);
+  window.removeEventListener('pageshow', alRestaurarPaginaOscar);
+  document.removeEventListener('visibilitychange', controlarVisibilidadRedOscar);
+  window.addEventListener('online', alCambiarIndicadorDelNavegadorOscar);
+  window.addEventListener('offline', alCambiarIndicadorDelNavegadorOscar);
+  window.addEventListener('pagehide', detenerMonitoreoRedOscar);
+  window.addEventListener('pageshow', alRestaurarPaginaOscar);
+  document.addEventListener('visibilitychange', controlarVisibilidadRedOscar);
   iniciarMonitoreoRedOscar();
 }
+
+function alRecuperarConexionOscar() {
+  iniciarMonitoreoRedOscar(true);
+}
+
+function alRestaurarPaginaOscar() {
+  iniciarMonitoreoRedOscar(false);
+}
+
+// Se ejecuta sin depender de jQuery; los demás controles se hidratan después.
+hidratarDetectorRedOscar();
 
 const modulosPorAreaOscar = {
   academico: [{ value: 'web2', label: 'Diseño Web II (SIS-0141)', detail: 'Área académica · UPDS' }],
@@ -499,7 +576,7 @@ function hidratarValidacionesOscar() {
       $('#formStatus').text('Guardando el registro en este dispositivo…').attr('class', 'form-status');
       guardarRegistroPendienteOscar(registroLocal).then(() => {
         programarSincronizacionRegistrosOscar();
-        const mensaje = navigator.onLine
+        const mensaje = estadoRedConfirmadoOscar === true
           ? 'Validación correcta. Registro guardado localmente y pendiente de envío: todavía no hay un servidor configurado. La contraseña no se almacenó.'
           : 'Validación correcta. Registro guardado localmente y pendiente de envío al recuperar la conexión. La contraseña no se almacenó.';
         $('#formStatus').text(mensaje).attr('class', 'form-status success');
@@ -551,7 +628,6 @@ $(function () {
   temporizadorHidratacionOscar = window.setTimeout(hidratarInterfazOscar, 500);
   const vistaInicial = (window.location.hash || '#inicio').replace('#', '');
   mostrarVistaOscar(vistasOscar.includes(vistaInicial) ? vistaInicial : 'inicio');
-  hidratarDetectorRedOscar();
 });
 
 // Limpieza de temporizadores al salir. Los listeners delegados se registran
@@ -561,7 +637,6 @@ $(window)
   .on('pagehide.oscarLimpieza', function () {
     window.clearTimeout(temporizadorHidratacionOscar);
     window.clearTimeout(temporizadorAvisoOscar);
-    detenerMonitoreoRedOscar();
   });
 
 // Si el navegador restaura la página desde bfcache antes de hidratarla,
@@ -569,7 +644,6 @@ $(window)
 $(window)
   .off('pageshow.oscarRehidratar')
   .on('pageshow.oscarRehidratar', function (event) {
-    iniciarMonitoreoRedOscar();
     const $contenedor = $('#contenedorMenu');
     if (event.originalEvent && event.originalEvent.persisted && $contenedor.attr('data-hidratado') !== 'true') {
       window.clearTimeout(temporizadorHidratacionOscar);
