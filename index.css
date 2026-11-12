@@ -76,3 +76,45 @@ button { font:inherit; cursor:pointer; }
   .entry-summary { grid-template-columns:1fr; }
 }
 @media(prefers-reduced-motion:reduce) { .entry-preview-photo img { transition:none; } }
+
+
+.entry-footer-note {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  text-align:left;
+}
+.entry-connection-status {
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  flex:0 0 auto;
+  padding:6px 10px;
+  border:1px solid rgba(245,155,85,.28);
+  border-radius:999px;
+  background:rgba(245,155,85,.09);
+  color:#ffb47e;
+  font:700 9px/1 'Segoe UI',system-ui,sans-serif;
+  letter-spacing:.5px;
+  white-space:nowrap;
+}
+.entry-connection-status i {
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:#f59b55;
+  box-shadow:0 0 0 3px rgba(245,155,85,.14);
+}
+.entry-connection-status.is-online {
+  border-color:rgba(118,214,160,.22);
+  background:rgba(118,214,160,.08);
+  color:#a6dfbb;
+}
+.entry-connection-status.is-online i {
+  background:#76d6a0;
+  box-shadow:0 0 0 3px rgba(118,214,160,.12);
+}
+@media(max-width:390px) {
+  .entry-footer-note { align-items:flex-start; flex-direction:column; gap:8px; }
+}

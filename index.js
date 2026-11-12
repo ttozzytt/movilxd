@@ -70,18 +70,73 @@
   });
 })();
 
-// Detector sencillo de conexión también en la portada.
+// Estado de conexión real en portada: verifica el acceso al sitio, no solo la red local.
 (function detectarEstadoRedPortadaOscar() {
   const indicador = document.getElementById('estadoRedPortada');
-  if (!indicador) return;
-  function actualizarEstado() {
-    indicador.textContent = `© 2026 Oscar Calle · Diseño Web II · ${navigator.onLine ? 'En línea' : 'Modo offline activo'}`;
+  const texto = document.getElementById('estadoRedPortadaTexto');
+  if (!indicador || !texto) return;
+  let estadoConfirmado = null;
+  let enCurso = false;
+  let temporizador = null;
+
+  function pintar(enLinea) {
+    estadoConfirmado = enLinea;
+    indicador.classList.toggle('is-online', enLinea);
+    indicador.classList.toggle('is-offline', !enLinea);
+    texto.textContent = enLinea ? 'Online' : 'Offline';
   }
-  window.removeEventListener('online', actualizarEstado);
-  window.removeEventListener('offline', actualizarEstado);
-  window.addEventListener('online', actualizarEstado);
-  window.addEventListener('offline', actualizarEstado);
-  actualizarEstado();
+
+  async function comprobar() {
+    if (!navigator.onLine) { pintar(false); return false; }
+    if (enCurso) return estadoConfirmado === true;
+    enCurso = true;
+    const controlador = new AbortController();
+    const limite = window.setTimeout(() => controlador.abort(), 5000);
+    try {
+      const destino = new URL('./index.html', window.location.href);
+      destino.searchParams.set('__connection_check', String(Date.now()));
+      const respuesta = await fetch(destino.href, {
+        method: 'GET', cache: 'no-store', credentials: 'same-origin', redirect: 'follow',
+        headers: { 'Cache-Control': 'no-cache' }, signal: controlador.signal
+      });
+      pintar(navigator.onLine && respuesta.ok);
+      return estadoConfirmado;
+    } catch (error) {
+      pintar(false);
+      return false;
+    } finally {
+      window.clearTimeout(limite);
+      enCurso = false;
+    }
+  }
+
+  function detener() { window.clearInterval(temporizador); temporizador = null; }
+  function iniciar() {
+    detener();
+    if (document.visibilityState === 'hidden') return;
+    comprobar();
+    temporizador = window.setInterval(() => {
+      if (document.visibilityState === 'visible') comprobar();
+    }, 20000);
+  }
+
+  function pintarOffline() { pintar(false); }
+  function controlarVisibilidad() {
+    if (document.visibilityState === 'hidden') detener();
+    else iniciar();
+  }
+  // Evita acumular listeners si la inicialización vuelve a ejecutarse.
+  window.removeEventListener('online', iniciar);
+  window.removeEventListener('offline', pintarOffline);
+  document.removeEventListener('visibilitychange', controlarVisibilidad);
+  window.removeEventListener('pagehide', detener);
+  window.removeEventListener('pageshow', iniciar);
+  window.addEventListener('online', iniciar);
+  window.addEventListener('offline', pintarOffline);
+  document.addEventListener('visibilitychange', controlarVisibilidad);
+  window.addEventListener('pagehide', detener);
+  window.addEventListener('pageshow', iniciar);
+  iniciar();
 })();
 
 // Registro del Service Worker estándar indicado por la guía PWA Offline-First.

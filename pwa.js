@@ -196,36 +196,88 @@ async function programarSincronizacionRegistrosOscar() {
   return false;
 }
 
-function actualizarEstadoRedOscar(mostrarMensaje = false) {
-  const enLinea = navigator.onLine;
-  const texto = enLinea ? 'Online' : 'Offline';
+let estadoRedConfirmadoOscar = null;
+let comprobacionRedEnCursoOscar = false;
+let temporizadorEstadoRedOscar = null;
+
+function actualizarEstadoRedOscar(enLinea, mostrarMensaje = false) {
+  const cambioEstado = estadoRedConfirmadoOscar !== enLinea;
+  estadoRedConfirmadoOscar = enLinea;
   $('#estadoRedEstado').toggleClass('is-online', enLinea).toggleClass('is-offline', !enLinea);
-  $('#estadoRedTexto').text(texto);
-  $('#estadoRedSidebar').text(enLinea ? 'Con conexión' : 'Modo offline · datos locales');
+  $('#estadoRedTexto').text(enLinea ? 'Online' : 'Offline');
+  $('#estadoRedSidebar').text(enLinea ? 'Con conexión a Internet' : 'Modo offline · datos locales');
   const color = enLinea ? '#76d6a0' : '#f59b55';
   $('#estadoRedIndicador, #estadoRedPunto').css({ background: color, boxShadow: `0 0 0 4px ${enLinea ? 'rgba(118,214,160,.1)' : 'rgba(245,155,85,.14)'}` });
 
-  if (!mostrarMensaje) return;
+  if (!mostrarMensaje || !cambioEstado) return;
   if (!enLinea) {
-    mostrarAvisoOscar('Modo offline activo. La página y sus recursos están disponibles desde el dispositivo.');
+    mostrarAvisoOscar('Sin acceso a Internet. La página y sus recursos guardados siguen disponibles.');
     return;
   }
   contarRegistrosPendientesOscar().then(cantidad => {
     if (cantidad > 0) {
       programarSincronizacionRegistrosOscar();
-      mostrarAvisoOscar(`Conexión recuperada. Hay ${cantidad} registro(s) local(es) pendiente(s); falta configurar un servidor para enviarlos.`);
+      mostrarAvisoOscar(`Internet recuperado. Hay ${cantidad} registro(s) local(es) pendiente(s); falta configurar un servidor para enviarlos.`);
     } else {
-      mostrarAvisoOscar('Conexión recuperada. La aplicación está en línea.');
+      mostrarAvisoOscar('Conexión a Internet recuperada. La aplicación está en línea.');
     }
-  }).catch(() => mostrarAvisoOscar('Conexión recuperada.'));
+  }).catch(() => mostrarAvisoOscar('Conexión a Internet recuperada.'));
+}
+
+async function comprobarConexionRealOscar(mostrarMensaje = false) {
+  if (!navigator.onLine) {
+    actualizarEstadoRedOscar(false, mostrarMensaje);
+    return false;
+  }
+  if (comprobacionRedEnCursoOscar) return estadoRedConfirmadoOscar === true;
+  comprobacionRedEnCursoOscar = true;
+  const controlador = new AbortController();
+  const limite = window.setTimeout(() => controlador.abort(), 5000);
+  try {
+    const destino = new URL('./index.html', window.location.href);
+    destino.searchParams.set('__connection_check', String(Date.now()));
+    const respuesta = await fetch(destino.href, {
+      method: 'GET', cache: 'no-store', credentials: 'same-origin', redirect: 'follow',
+      headers: { 'Cache-Control': 'no-cache' }, signal: controlador.signal
+    });
+    const enLinea = navigator.onLine && respuesta.ok;
+    actualizarEstadoRedOscar(enLinea, mostrarMensaje);
+    return enLinea;
+  } catch (error) {
+    actualizarEstadoRedOscar(false, mostrarMensaje);
+    return false;
+  } finally {
+    window.clearTimeout(limite);
+    comprobacionRedEnCursoOscar = false;
+  }
+}
+
+function detenerMonitoreoRedOscar() {
+  window.clearInterval(temporizadorEstadoRedOscar);
+  temporizadorEstadoRedOscar = null;
+}
+
+function iniciarMonitoreoRedOscar() {
+  detenerMonitoreoRedOscar();
+  if (document.visibilityState === 'hidden') return;
+  comprobarConexionRealOscar(false);
+  temporizadorEstadoRedOscar = window.setInterval(() => {
+    if (document.visibilityState === 'visible') comprobarConexionRealOscar(false);
+  }, 20000);
 }
 
 function hidratarDetectorRedOscar() {
   $(window)
     .off('online.oscarRed offline.oscarRed')
-    .on('online.oscarRed', () => actualizarEstadoRedOscar(true))
-    .on('offline.oscarRed', () => actualizarEstadoRedOscar(true));
-  actualizarEstadoRedOscar(!navigator.onLine);
+    .on('online.oscarRed', () => comprobarConexionRealOscar(true))
+    .on('offline.oscarRed', () => actualizarEstadoRedOscar(false, true));
+  $(document)
+    .off('visibilitychange.oscarRed')
+    .on('visibilitychange.oscarRed', () => {
+      if (document.visibilityState === 'hidden') detenerMonitoreoRedOscar();
+      else iniciarMonitoreoRedOscar();
+    });
+  iniciarMonitoreoRedOscar();
 }
 
 const modulosPorAreaOscar = {
@@ -509,6 +561,7 @@ $(window)
   .on('pagehide.oscarLimpieza', function () {
     window.clearTimeout(temporizadorHidratacionOscar);
     window.clearTimeout(temporizadorAvisoOscar);
+    detenerMonitoreoRedOscar();
   });
 
 // Si el navegador restaura la página desde bfcache antes de hidratarla,
@@ -516,6 +569,7 @@ $(window)
 $(window)
   .off('pageshow.oscarRehidratar')
   .on('pageshow.oscarRehidratar', function (event) {
+    iniciarMonitoreoRedOscar();
     const $contenedor = $('#contenedorMenu');
     if (event.originalEvent && event.originalEvent.persisted && $contenedor.attr('data-hidratado') !== 'true') {
       window.clearTimeout(temporizadorHidratacionOscar);
