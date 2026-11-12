@@ -196,7 +196,7 @@ async function programarSincronizacionRegistrosOscar() {
   return false;
 }
 
-let estadoRedConfirmadoOscar = null;
+let estadoRedConfirmadoOscar = typeof window.__OSCAR_PWA_ONLINE__ === 'boolean' ? window.__OSCAR_PWA_ONLINE__ : null;
 let comprobacionRedEnCursoOscar = false;
 let temporizadorEstadoRedOscar = null;
 let controladorEstadoRedOscar = null;
@@ -247,43 +247,23 @@ function actualizarEstadoRedOscar(enLinea, mostrarMensaje = false) {
 }
 
 async function comprobarConexionRealOscar(mostrarMensaje = false) {
-  // navigator.onLine es orientativo; la respuesta de red del propio sitio manda.
   if (comprobacionRedEnCursoOscar) return estadoRedConfirmadoOscar === true;
-
   comprobacionRedEnCursoOscar = true;
   const revisionActual = ++revisionEstadoRedOscar;
   const controlador = new AbortController();
   controladorEstadoRedOscar = controlador;
-  const limite = window.setTimeout(() => controlador.abort(), 8000);
+  const limite = window.setTimeout(() => controlador.abort(), 4500);
 
   try {
     const destino = new URL('./manifest.json', document.baseURI || window.location.href);
-    destino.searchParams.set('__connection_check', String(Date.now()));
-    let respuesta = null;
-    try {
-      respuesta = await fetch(destino.href, {
-        method: 'HEAD',
-        cache: 'no-store',
-        credentials: 'same-origin',
-        redirect: 'follow',
-        signal: controlador.signal
-      });
-    } catch (errorHead) {
-      if (controlador.signal.aborted) throw errorHead;
-      // Un navegador o servidor puede rechazar HEAD aunque GET esté disponible.
-    }
-
-    // Si HEAD no está soportado o falla por el método, se prueba GET en la red.
-    if (!respuesta || !respuesta.ok) {
-      respuesta = await fetch(destino.href, {
-        method: 'GET',
-        cache: 'no-store',
-        credentials: 'same-origin',
-        redirect: 'follow',
-        signal: controlador.signal
-      });
-    }
-
+    destino.searchParams.set('__connection_check', `${Date.now()}-${Math.random().toString(36).slice(2)}`);
+    const respuesta = await fetch(destino.href, {
+      method: 'GET',
+      cache: 'no-store',
+      credentials: 'same-origin',
+      redirect: 'follow',
+      signal: controlador.signal
+    });
     const enLinea = revisionActual === revisionEstadoRedOscar && respuesta.ok;
     if (revisionActual === revisionEstadoRedOscar) actualizarEstadoRedOscar(enLinea, mostrarMensaje);
     return enLinea;
@@ -354,8 +334,30 @@ function alRestaurarPaginaOscar() {
   iniciarMonitoreoRedOscar(false);
 }
 
-// Se ejecuta sin depender de jQuery; los demás controles se hidratan después.
-hidratarDetectorRedOscar();
+// El estado de conexión se inicia desde pwa.html antes de esperar a jQuery.
+// Este bloque sincroniza los avisos y el formulario con el monitor independiente.
+if (window.__OSCAR_PWA_CONNECTION_MONITOR__) {
+  window.addEventListener('oscar:pwa-connection', event => {
+    const detalle = event.detail || {};
+    const anterior = estadoRedConfirmadoOscar;
+    estadoRedConfirmadoOscar = detalle.online === true;
+    if (!detalle.notify || !detalle.changed || anterior === estadoRedConfirmadoOscar) return;
+    if (!estadoRedConfirmadoOscar) {
+      mostrarAvisoOscar('Sin acceso a Internet. La página y sus recursos guardados siguen disponibles.');
+    } else {
+      contarRegistrosPendientesOscar().then(cantidad => {
+        if (cantidad > 0) {
+          programarSincronizacionRegistrosOscar();
+          mostrarAvisoOscar(`Internet recuperado. Hay ${cantidad} registro(s) local(es) pendiente(s); falta configurar un servidor para enviarlos.`);
+        } else {
+          mostrarAvisoOscar('Conexión a Internet recuperada. La aplicación está en línea.');
+        }
+      }).catch(() => mostrarAvisoOscar('Conexión a Internet recuperada.'));
+    }
+  });
+} else {
+  hidratarDetectorRedOscar();
+}
 
 const modulosPorAreaOscar = {
   academico: [{ value: 'web2', label: 'Diseño Web II (SIS-0141)', detail: 'Área académica · UPDS' }],
