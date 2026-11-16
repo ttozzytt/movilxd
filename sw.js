@@ -26,7 +26,7 @@ const RECURSOS_OSCAR = [
   './imagenes/retrato-verde.webp',
   './imagenes/selfie-espejo.webp',
   './imagenes/skate-detalle.webp',
-  './imagenes/skatepark.webp'
+  './imagenes/parque-skate.webp'
 ];
 
 // Déjalo vacío mientras no exista un servidor/API que reciba los formularios.
