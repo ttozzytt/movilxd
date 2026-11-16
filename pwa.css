@@ -915,14 +915,15 @@ body.viewer-open { overflow:hidden; }
 .home-moments { display:flex; flex-direction:column; gap:8px; margin-top:2px; }
 .home-moments-head { display:flex; justify-content:space-between; align-items:center; gap:8px; }
 .home-moments-head>span:last-child { color:var(--soft); font-size:9px; }
-.home-moments-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:9px; }
+.home-moments-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:9px; }
+.home-moment.photo-reference { display:flex; flex-direction:column; text-decoration:none; }
 .home-moment { height:92px; }
 .home-moment img { height:68px; }
 .home-moment span { padding:5px 8px; font-size:8px; }
 @media(max-width:760px) {
   .home-moments { gap:6px; }
   .home-moments-head>span:last-child { font-size:8px; }
-  .home-moments-grid { gap:7px; }
+  .home-moments-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px; }
   .home-moment { height:78px; }
   .home-moment img { height:56px; }
   .home-moment span { padding:4px 6px; font-size:7px; }

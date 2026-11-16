@@ -5,7 +5,7 @@
  */
 'use strict';
 
-const CACHE_OSCAR = 'oscar-movilxd-offline-first-v10';
+const CACHE_OSCAR = 'oscar-movilxd-offline-first-v11-foto-pexels';
 const RUTA_BASE_OSCAR = self.registration.scope;
 const JQUERY_OSCAR = 'https://code.jquery.com/jquery-3.6.0.min.js';
 const RECURSOS_OSCAR = [
@@ -96,6 +96,22 @@ self.addEventListener('fetch', event => {
   // Las pruebas de Internet V10 usan destinos externos. Este SW nunca los cachea ni los intercepta.
   // Las rutas locales con el parámetro de prueba también se dejan pasar directamente a la red.
   if (url.searchParams.has('__connection_check')) return;
+  const esFotoPexels = solicitud.destination === 'image' && url.hostname === 'images.pexels.com';
+  if (esFotoPexels) {
+    event.respondWith((async () => {
+      const cache = await caches.open(CACHE_OSCAR);
+      const guardada = await cache.match(solicitud);
+      if (guardada) return guardada;
+      try {
+        const respuesta = await fetch(solicitud);
+        if (respuesta.ok || respuesta.type === 'opaque') await cache.put(solicitud, respuesta.clone());
+        return respuesta;
+      } catch (_) {
+        return (await cache.match(new URL('./imagenes/parque-skate.webp', RUTA_BASE_OSCAR).href)) || Response.error();
+      }
+    })());
+    return;
+  }
   const esMismoOrigen = url.origin === self.location.origin;
   const esJQuery = url.href === JQUERY_OSCAR;
   if (!esMismoOrigen && !esJQuery) return;
