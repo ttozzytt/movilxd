@@ -278,3 +278,11 @@
   #view-favoritos .select-grid select,
   #view-favoritos .field-select { width: 100%; min-width: 0; }
 }
+
+
+/* Mantener la composición vertical original dentro de cada tarjeta de Favoritos. */
+@media (max-width: 760px) {
+  #view-favoritos .favorites-panel,
+  #view-favoritos .games-panel { display:block; }
+  #view-favoritos .cascade-panel { display:flex; flex-direction:column; }
+}
