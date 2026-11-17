@@ -51,9 +51,12 @@ function cerrarMenuMovilOscar() {
 
 function abrirFotoOscar(botonFoto) {
   const $botonFoto = $(botonFoto);
+  const $miniatura = $botonFoto.find('img').first();
   $('#photoViewerImage').attr({
     src: $botonFoto.attr('data-photo'),
-    alt: $botonFoto.find('img').attr('alt') || 'Fotografía personal de Oscar'
+    alt: $miniatura.attr('alt') || 'Fotografía personal de Oscar',
+    width: Number($miniatura.attr('width')) || 1200,
+    height: Number($miniatura.attr('height')) || 800
   });
   $('#photoViewerCaption').text($botonFoto.attr('data-caption') || '');
   $('#photoViewer').addClass('open').attr('aria-hidden', 'false');
