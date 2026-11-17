@@ -200,3 +200,21 @@ button { font:inherit; cursor:pointer; }
   .theme-toggle { width:44px; min-width:44px; height:44px; padding:0; }
   .theme-toggle__label { display:none; }
 }
+
+
+/* Landscape · portada Personal: conserva la galería sin consumir toda la altura. */
+@media (orientation: landscape) and (max-height: 500px) {
+  .entry-body { padding:8px; }
+  .entry-card-photo { gap:12px; padding:14px; }
+  .entry-photo-mosaic { height:230px; }
+  .entry-brand { margin-bottom:12px; }
+  .entry-card h1 { margin:8px 0; font-size:clamp(30px,4vw,42px); }
+  .entry-summary { margin:10px 0; }
+  .entry-photo-preview { margin-top:8px; padding:10px; }
+  .entry-preview-photo { height:65px; }
+}
+@media (orientation: landscape) and (max-height: 500px) and (max-width: 760px) {
+  .entry-card-photo { grid-template-columns:1fr; }
+  .entry-photo-mosaic { height:145px; }
+  .entry-preview-grid { grid-template-columns:repeat(5,minmax(0,1fr)); }
+}

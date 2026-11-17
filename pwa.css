@@ -1092,3 +1092,38 @@ button[data-hidratado="true"] { cursor:pointer; }
   .theme-toggle { width: 44px; min-width: 44px; height: 44px; padding: 0; }
   .theme-toggle__label { display: none; }
 }
+
+
+/* C3-A2 · Landscape: reduce cabecera y espacios verticales sin cortar contenido. */
+@media (orientation: landscape) and (max-height: 500px) {
+  .app-shell { height:100dvh; min-height:0; }
+  .topbar { height:52px; min-height:52px; flex-basis:52px; padding-top:5px; padding-bottom:5px; }
+  .main-content { padding-top:7px; padding-bottom:10px; }
+  .view.active { gap:9px; }
+  .view-heading h1 { margin-top:5px; margin-bottom:3px; font-size:clamp(23px,3vw,30px); }
+  .view-heading p { font-size:10px; line-height:1.4; }
+  .welcome-row { min-height:0; padding-top:2px; padding-bottom:2px; gap:10px; }
+  .welcome-row h1 { margin:7px 0; font-size:clamp(25px,3.8vw,36px); }
+  .hero-art { height:118px; }
+  .hero-monogram { width:76px; height:76px; font-size:29px; }
+  .profile-layout, .routine-layout, .favorites-layout, .form-layout {
+    height:auto;
+    min-height:0;
+    flex:0 0 auto;
+  }
+  .profile-intro, .list-panel, .schedule-panel, .hours-panel,
+  .favorites-panel, .games-panel, .cascade-panel, .form-panel,
+  .contact-aside { overflow:visible; }
+}
+@media (orientation: landscape) and (max-height: 500px) and (max-width: 760px) {
+  .topbar { height:48px; min-height:48px; flex-basis:48px; padding-right:10px; padding-left:10px; }
+  .main-content { padding:6px 10px calc(62px + env(safe-area-inset-bottom)); }
+  .view.active { gap:7px; }
+  .welcome-row { grid-template-columns:1fr; }
+  .hero-art { display:none; }
+  .bottom-nav { height:56px; flex-basis:56px; padding-top:3px; padding-bottom:3px; }
+  .bottom-item { min-height:44px; }
+  .moments-grid { grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px; }
+  .moments-grid .photo-card { height:105px; min-height:105px; }
+  .moments-grid .photo-card img { height:75px; flex-basis:75px; }
+}
