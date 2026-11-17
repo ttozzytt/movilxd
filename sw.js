@@ -5,7 +5,7 @@
  */
 'use strict';
 
-const CACHE_OSCAR = 'oscar-movilxd-offline-first-v11-foto-pexels';
+const CACHE_OSCAR = 'oscar-movilxd-offline-first-v12-c3-a2';
 const RUTA_BASE_OSCAR = self.registration.scope;
 const JQUERY_OSCAR = 'https://code.jquery.com/jquery-3.6.0.min.js';
 const RECURSOS_OSCAR = [
@@ -16,6 +16,8 @@ const RECURSOS_OSCAR = [
   './pwa.html',
   './pwa.css',
   './pwa.js',
+  './theme.css',
+  './js/security-and-vitals.js',
   './manifest.json',
   './icons/icon-192.png',
   './icons/icon-512.png',

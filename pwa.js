@@ -66,12 +66,16 @@ function cerrarFotoOscar() {
   $('body').removeClass('viewer-open');
 }
 
+const PALABRAS_PROHIBIDAS_OSCAR=new Set(['puta','putas','puto','putos','mierda','mierdas','pendejo','pendeja','pendejos','pendejas','idiota','idiotas','imbecil','imbeciles','estupido','estupida','estupidos','estupidas','cabron','cabrona','cabrones','hijueputa','malparido','malparida','maricon','maricones','verga','vergas','coño','concha','boludo','boluda','fuck','fucking','shit','bitch','asshole']);
+function normalizarTextoModeracionOscar(v){return String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('es-BO').replace(/[@4]/g,'a').replace(/[0]/g,'o').replace(/[1!]/g,'i').replace(/[3]/g,'e').replace(/[5$]/g,'s').replace(/[7]/g,'t').replace(/[^a-z0-9]+/g,' ').replace(/\s+/g,' ').trim()}
+function contienePalabraProhibidaOscar(v){return normalizarTextoModeracionOscar(v).split(' ').some(w=>PALABRAS_PROHIBIDAS_OSCAR.has(w))}
 function mensajeErrorCampoOscar(idCampo) {
   const valor = $('#' + idCampo).val().trim();
   switch (idCampo) {
     case 'fullName':
       if (!valor) return 'Escribe tu nombre completo.';
       if (valor.length < 3) return 'Debe tener al menos 3 caracteres.';
+      if (contienePalabraProhibidaOscar(valor)) return 'Evita palabras ofensivas o insultos.';
       if (!/^[\p{L}][\p{L}\s'.-]{1,59}$/u.test(valor)) return 'Usa letras y separadores válidos.';
       return '';
     case 'email':
@@ -99,6 +103,7 @@ function mensajeErrorCampoOscar(idCampo) {
       if (!valor) return 'Escribe un mensaje.';
       if (valor.length < 10) return 'El mensaje debe tener al menos 10 caracteres.';
       if (valor.length > 200) return 'Superaste el máximo de 200 caracteres.';
+      if (contienePalabraProhibidaOscar(valor)) return 'Evita palabras ofensivas o insultos.';
       return '';
     case 'terms':
       return $('#terms').prop('checked') ? '' : 'Debes aceptar esta condición.';
@@ -412,6 +417,8 @@ function hidratarDelegacionEventosOscar() {
     });
 }
 
+function renderizarHTMLSeguroOscar(node,html){if(!node)return;if(window.DOMPurify&&typeof window.DOMPurify.sanitize==='function')node.innerHTML=window.DOMPurify.sanitize(String(html||''),{USE_PROFILES:{html:true}});else node.textContent=String(html||'').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim()}
+function hidratarTemaOscar(){const b=document.getElementById('themeToggle'),m=document.getElementById('themeColorMeta');const apply=t=>{const light=t==='light';document.documentElement.dataset.theme=light?'light':'dark';try{localStorage.setItem('oscar-pwa-theme-v1',light?'light':'dark')}catch(_){}if(m)m.content=light?'#f5f7fb':'#111820';if(b){b.querySelector('.theme-toggle__icon').textContent=light?'☾':'☀';b.querySelector('.theme-toggle__label').textContent=light?'Modo oscuro':'Modo claro';b.setAttribute('aria-label',light?'Activar modo oscuro':'Activar modo claro');b.setAttribute('aria-pressed',String(light))}};apply(document.documentElement.dataset.theme==='light'?'light':'dark');if(b&&b.dataset.themeReady!=='true'){b.addEventListener('click',()=>apply(document.documentElement.dataset.theme==='light'?'dark':'light'));b.dataset.themeReady='true'}}
 function hidratarFiltroTresCapasOscar() {
   $(document)
     .off('change.oscarArea', '#areaSelect')
@@ -420,7 +427,7 @@ function hidratarFiltroTresCapasOscar() {
       $('#moduleSelect').empty().append(new Option('Selecciona un módulo', ''));
       modulos.forEach(modulo => $('#moduleSelect').append(new Option(modulo.label, modulo.value)));
       $('#moduleSelect').prop('disabled', modulos.length === 0);
-      $('#layerResult').html('<span class="result-icon">✦</span><div><small>RESULTADO</small><strong>Esperando selección</strong><p>Elige un módulo para ver el elemento.</p></div>');
+      renderizarHTMLSeguroOscar(document.getElementById('layerResult'), '<span class="result-icon">✦</span><div><small>RESULTADO</small><strong>Esperando selección</strong><p>Elige un módulo para ver el elemento.</p></div>');
     });
 
   $(document)
@@ -429,10 +436,10 @@ function hidratarFiltroTresCapasOscar() {
       const modulos = modulosPorAreaOscar[$('#areaSelect').val()] || [];
       const modulo = modulos.find(item => item.value === this.value);
       if (!modulo) {
-        $('#layerResult').html('<span class="result-icon">✦</span><div><small>RESULTADO</small><strong>Esperando selección</strong><p>El resultado aparecerá aquí.</p></div>');
+        renderizarHTMLSeguroOscar(document.getElementById('layerResult'), '<span class="result-icon">✦</span><div><small>RESULTADO</small><strong>Esperando selección</strong><p>El resultado aparecerá aquí.</p></div>');
         return;
       }
-      $('#layerResult').html('<span class="result-icon">✓</span><div><small>CAPA 3 · ELEMENTO FILTRADO</small><strong>' + modulo.label + '</strong><p>' + modulo.detail + '</p></div>');
+      renderizarHTMLSeguroOscar(document.getElementById('layerResult'), '<span class="result-icon">✓</span><div><small>CAPA 3 · ELEMENTO FILTRADO</small><strong>' + modulo.label + '</strong><p>' + modulo.detail + '</p></div>');
     });
 }
 
@@ -616,6 +623,7 @@ function hidratarInterfazOscar() {
   hidratarSeleccionMusicalOscar();
   hidratarPersistenciaLocalOscar();
   hidratarValidacionesOscar();
+  hidratarTemaOscar();
   marcarControlesHidratadosOscar();
   $contenedor.attr('data-hidratado', 'true');
 

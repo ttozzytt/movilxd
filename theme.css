@@ -1,0 +1,18 @@
+/* Tema persistente y componentes BEM. */
+.theme-toggle{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:36px;padding:7px 11px;border:1px solid var(--line);border-radius:10px;color:var(--text);background:var(--panel2);font-size:11px;font-weight:700;cursor:pointer}
+.theme-toggle__icon{display:inline-grid;place-items:center;font-size:16px;line-height:1}.theme-toggle__label{white-space:nowrap}.theme-toggle:focus-visible{outline:2px solid var(--orange);outline-offset:3px}.top-actions{gap:10px}
+:root[data-theme="light"]{color-scheme:light;--bg:#f3f6fa;--bg2:#e9eef4;--panel:#fff;--panel2:#f4f7fb;--line:rgba(29,47,64,.14);--text:#172533;--muted:#526272;--soft:#66798a;--shadow:0 14px 38px rgba(24,42,58,.10)}
+:root[data-theme="light"] body,:root[data-theme="light"] .app-shell,:root[data-theme="light"] .sidebar,:root[data-theme="light"] .topbar,:root[data-theme="light"] .main-content,:root[data-theme="light"] .bottom-nav{background:#f3f6fa;color:var(--text)}
+:root[data-theme="light"] .sidebar{background:#e9eef4;border-color:var(--line)}
+:root[data-theme="light"] .panel,:root[data-theme="light"] .summary-card,:root[data-theme="light"] .favorites-panel,:root[data-theme="light"] .games-panel,:root[data-theme="light"] .cascade-panel,:root[data-theme="light"] .form-panel,:root[data-theme="light"] .contact-aside,:root[data-theme="light"] .quote-strip{background:#fff;color:var(--text);border-color:var(--line);box-shadow:var(--shadow)}
+:root[data-theme="light"] .summary-card strong,:root[data-theme="light"] .profile-intro h2,:root[data-theme="light"] .panel-title h3,:root[data-theme="light"] .form-topline h3,:root[data-theme="light"] .list-row,:root[data-theme="light"] .timeline-row strong,:root[data-theme="light"] .favorite-row strong,:root[data-theme="light"] .game-card strong,:root[data-theme="light"] .contact-link,:root[data-theme="light"] .view-heading h1{color:var(--text)}
+:root[data-theme="light"] .profile-intro p,:root[data-theme="light"] .lead,:root[data-theme="light"] .timeline-row small,:root[data-theme="light"] .favorite-row small,:root[data-theme="light"] .game-card small,:root[data-theme="light"] .contact-aside>p{color:var(--muted)}
+:root[data-theme="light"] .form-field input,:root[data-theme="light"] .form-field textarea,:root[data-theme="light"] .select-grid select,:root[data-theme="light"] .field-select,:root[data-theme="light"] .search-box{color:#172533;background:#fff;border-color:rgba(29,47,64,.2)}
+:root[data-theme="light"] .search-box input,:root[data-theme="light"] .mobile-menu button,:root[data-theme="light"] .nav-item{color:#34495a}
+:root[data-theme="light"] .mobile-menu{background:#fff;border-color:var(--line)}
+:root[data-theme="light"] .nav-item.active{color:#9a4d13;background:rgba(255,139,69,.15)}
+:root[data-theme="light"] .bottom-item{color:#526272}:root[data-theme="light"] .bottom-item.active{color:#9a4d13}
+:root[data-theme="light"] .brand strong,:root[data-theme="light"] .breadcrumb strong{color:#1c2b38}
+:root[data-theme="light"] .form-field label,:root[data-theme="light"] .check-wrap{color:#34495a}
+.home-feature-photo,.home-feature-photo img,.moments-grid .photo-card img,.mini-photo img,.profile-main-photo,.home-moment img{aspect-ratio:16/9}
+@media(max-width:760px){.theme-toggle{min-width:36px;width:36px;height:36px;padding:0}.theme-toggle__label{display:none}}
