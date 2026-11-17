@@ -222,3 +222,60 @@
     box-shadow: none;
   }
 }
+
+
+/* MÓVIL · Favoritos apilados: nunca mostrar columnas laterales recortadas. */
+@media (max-width: 760px) {
+  #view-favoritos,
+  #view-favoritos .favorites-layout,
+  #view-favoritos .favorites-column {
+    display: flex;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    height: auto;
+    min-height: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    overflow: visible;
+  }
+  #view-favoritos .favorites-layout {
+    flex: 0 0 auto;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto;
+  }
+  #view-favoritos .favorites-column {
+    display: flex;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto;
+  }
+  #view-favoritos .favorites-panel,
+  #view-favoritos .games-panel,
+  #view-favoritos .cascade-panel {
+    display: flex;
+    position: static;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    flex: 0 0 auto;
+    grid-column: auto;
+    grid-row: auto;
+    overflow: visible;
+    box-sizing: border-box;
+  }
+  #view-favoritos .favorites-panel { overflow: visible; }
+  #view-favoritos .favorite-row,
+  #view-favoritos .game-card,
+  #view-favoritos .food-line,
+  #view-favoritos .layer-result { min-width: 0; }
+  #view-favoritos .search-box,
+  #view-favoritos .search-box input,
+  #view-favoritos .select-grid,
+  #view-favoritos .select-grid label,
+  #view-favoritos .select-grid select,
+  #view-favoritos .field-select { width: 100%; min-width: 0; }
+}
