@@ -226,7 +226,6 @@
 
 /* MÓVIL · Favoritos apilados: nunca mostrar columnas laterales recortadas. */
 @media (max-width: 760px) {
-  #view-favoritos,
   #view-favoritos .favorites-layout,
   #view-favoritos .favorites-column {
     display: flex;
