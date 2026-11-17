@@ -134,3 +134,69 @@ button { font:inherit; cursor:pointer; }
   background:#94a3ad;
   box-shadow:0 0 0 3px rgba(148,163,173,.12);
 }
+
+
+/* Escritorio: portada centrada y amplia, no simulación de una pantalla móvil. */
+@media (min-width:1025px) {
+  .entry-page-gallery { width:min(1100px,100%); }
+}
+
+/* Tema persistente compartido con la PWA principal. */
+.theme-toggle {
+  display:inline-flex;
+  min-width:44px;
+  min-height:44px;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  padding:7px 11px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  color:var(--text);
+  background:rgba(255,255,255,.06);
+  font:700 10px/1.2 'Segoe UI',system-ui,sans-serif;
+  cursor:pointer;
+}
+.theme-toggle__icon { display:inline-grid; place-items:center; font-size:16px; }
+.theme-toggle__label { white-space:nowrap; }
+.theme-toggle:focus-visible { outline:2px solid var(--orange); outline-offset:3px; }
+.entry-theme-toggle { margin-left:auto; flex:0 0 auto; }
+:root[data-theme="light"] {
+  color-scheme:light;
+  --bg:#f3f6fa;
+  --line:rgba(29,47,64,.14);
+  --text:#172533;
+  --soft:#66798a;
+  --orange:#a9551e;
+  --orange2:#c66d32;
+  --shadow:0 14px 38px rgba(24,42,58,.10);
+}
+:root[data-theme="light"] body {
+  color:var(--text);
+  background:radial-gradient(ellipse at 70% 0%,#e5edf4 0,transparent 38%),var(--bg);
+}
+:root[data-theme="light"] .entry-card,
+:root[data-theme="light"] .entry-photo-preview {
+  color:var(--text);
+  background:#fff;
+  border-color:var(--line);
+  box-shadow:var(--shadow);
+}
+:root[data-theme="light"] .entry-brand,
+:root[data-theme="light"] .entry-card h1,
+:root[data-theme="light"] .entry-summary strong { color:var(--text); }
+:root[data-theme="light"] .entry-lead,
+:root[data-theme="light"] .entry-note,
+:root[data-theme="light"] .entry-footer-note,
+:root[data-theme="light"] .entry-preview-heading>span:last-child { color:#536579; }
+:root[data-theme="light"] .eyebrow { color:#526579; }
+:root[data-theme="light"] .entry-summary article {
+  background:#f5f7fa;
+  border-color:var(--line);
+}
+:root[data-theme="light"] .entry-summary small { color:#536579; }
+:root[data-theme="light"] .theme-toggle { color:#25384b; background:#fff; border-color:var(--line); }
+@media (max-width:760px) {
+  .theme-toggle { width:44px; min-width:44px; height:44px; padding:0; }
+  .theme-toggle__label { display:none; }
+}

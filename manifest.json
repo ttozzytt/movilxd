@@ -1,6 +1,8 @@
 {
-  "short_name": "PortafolioPWA",
-  "name": "Aplicación Progresiva Portafolio - UPDS",
+  "id": "./pwa.html",
+  "short_name": "Oscar",
+  "name": "Oscar Calle · Mi espacio",
+  "description": "Aplicación progresiva personal de Oscar Calle.",
   "icons": [
     {
       "src": "icons/icon-192.png",
@@ -13,11 +15,16 @@
       "sizes": "512x512"
     }
   ],
-  "start_url": "./index.html",
+  "start_url": "./pwa.html#inicio",
   "scope": "./",
-  "background_color": "#0f172a",
-  "theme_color": "#f97316",
+  "background_color": "#111820",
+  "theme_color": "#ff8b45",
   "display": "standalone",
-  "orientation": "portrait",
-  "lang": "es"
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
+  "orientation": "any",
+  "lang": "es",
+  "prefer_related_applications": false
 }

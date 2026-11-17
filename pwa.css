@@ -403,121 +403,7 @@ body { overscroll-behavior:none; }
 }
 
 
-/* ===== En computadora: marco centrado tipo celular (guía de clase) ===== */
-@media (min-width: 1025px) {
-  body {
-    background: #e2e8f0;
-    padding: 18px 0;
-  }
 
-  .app-shell {
-    width: min(768px, calc(100vw - 36px));
-    max-width: none;
-    height: min(900px, calc(100dvh - 36px));
-    min-height: min(560px, calc(100dvh - 36px));
-    margin: 0 auto;
-    overflow: hidden;
-    border: 1px solid #cbd5e1;
-    border-top: 4px solid var(--orange);
-    border-radius: 18px;
-    box-shadow: 0 18px 55px rgba(15, 23, 42, .18);
-  }
-
-  /* En el marco de computadora se muestra la navegación compacta. */
-  .sidebar { display: none; }
-  .app-column { width: 100%; min-width: 0; position: relative; }
-  .topbar {
-    height: 64px;
-    flex: 0 0 64px;
-    padding: 0 22px;
-  }
-  .mobile-brand {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    color: var(--text);
-    font: 700 10px 'Segoe UI', system-ui, sans-serif;
-    letter-spacing: 1px;
-  }
-  .breadcrumb, .live-label { display: none; }
-  .mobile-menu-toggle { display: block; }
-  .mobile-menu {
-    position: absolute;
-    display: none;
-    top: 66px;
-    right: 18px;
-    z-index: 25;
-    width: 205px;
-    padding: 7px;
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    background: #1d2a35;
-    box-shadow: var(--shadow);
-  }
-  .mobile-menu button {
-    display: block;
-    width: 100%;
-    border: 0;
-    background: transparent;
-    color: #c4d0d6;
-    text-align: left;
-    padding: 11px 12px;
-    border-radius: 8px;
-    font-size: 14px;
-  }
-  .mobile-menu button span { font-size: 11px; margin-left: 9px; }
-  .main-content {
-    flex: 1 1 auto;
-    height: 0;
-    min-height: 0;
-    padding: 18px 24px 12px;
-    overflow: hidden ;
-  }
-  .view.active { gap: 13px; }
-  .welcome-row {
-    min-height: 190px;
-    padding: 8px 4px 6px;
-  }
-  .hero-art { height: 170px; }
-  .hero-monogram { width: 104px; height: 104px; font-size: 40px; }
-  .profile-layout, .routine-layout, .favorites-layout, .form-layout {
-    flex: 1 1 auto;
-    min-height: 0;
-  }
-  .profile-layout, .routine-layout { height: 100%; }
-  .profile-intro { padding: 20px; }
-  .list-panel, .schedule-panel, .hours-panel,
-  .favorites-panel, .games-panel, .cascade-panel,
-  .form-panel, .contact-aside { min-height: 0; overflow: hidden; }
-
-  /* Barra inferior sencilla, como en la vista móvil. */
-  .bottom-nav {
-    display: flex;
-    flex: 0 0 62px;
-    height: 62px;
-    justify-content: space-around;
-    align-items: center;
-    border-top: 1px solid var(--line);
-    background: rgba(14, 21, 28, .97);
-    padding: 5px 8px;
-    z-index: 10;
-  }
-  .bottom-item {
-    border: 0;
-    background: transparent;
-    color: #7c8e9a;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    min-width: 54px;
-    padding: 4px 5px;
-  }
-  .bottom-item span { font-size: 17px; line-height: 1; }
-  .bottom-item small { font-size: 8px; }
-  .bottom-item.active { color: var(--orange); }
-}
 
 
 
@@ -1082,150 +968,7 @@ button[data-hidratado="true"] { cursor:pointer; }
 }
 
 
-/* PC: marco PWA centrado de 768 px, según la guía de adaptabilidad.
-   Al estar limitado el marco, se usa la navegación compacta para no comprimir
-   las fotografías ni las cuadrículas dentro de una barra lateral. */
-@media (min-width:1025px) {
-  body {
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:18px 0;
-  }
-  .app-shell {
-    display:flex;
-    flex-direction:column;
-    width:min(768px,calc(100vw - 36px));
-    height:min(900px,calc(100dvh - 36px));
-    min-height:min(560px,calc(100dvh - 36px));
-    margin:0;
-    overflow:hidden;
-  }
-  .sidebar { display:none; }
-  .app-column {
-    position:relative;
-    width:100%;
-    min-width:0;
-    height:100%;
-    flex:1 1 auto;
-  }
-  .topbar {
-    height:58px;
-    flex:0 0 58px;
-    padding:0 20px;
-  }
-  .mobile-brand { display:flex; align-items:center; gap:9px; }
-  .breadcrumb { display:none; }
-  .top-actions { display:flex; align-items:center; gap:9px; }
-  .mobile-menu-toggle {
-    display:grid;
-    place-items:center;
-    width:36px;
-    min-width:36px;
-    max-width:36px;
-    height:36px;
-    padding:0;
-    font-size:17px;
-  }
-  .mobile-menu {
-    position:absolute;
-    display:none;
-    top:58px;
-    right:12px;
-    z-index:25;
-    width:205px;
-    padding:7px;
-    border:1px solid var(--line);
-    border-radius:12px;
-    background:#1d2a35;
-    box-shadow:var(--shadow);
-  }
-  .mobile-menu button {
-    display:block;
-    width:100%;
-    border:0;
-    background:transparent;
-    color:#c4d0d6;
-    text-align:left;
-    padding:11px 12px;
-    border-radius:8px;
-    font-size:14px;
-  }
-  .mobile-menu button span { font-size:11px; margin-left:9px; }
-  .main-content {
-    height:auto;
-    flex:1 1 auto;
-    min-height:0;
-    padding:24px 28px 18px;
-    overflow-y:auto ;
-  }
-  .view { height:auto; min-height:100%; overflow:visible; }
-  .view.active { height:auto; min-height:100%; gap:18px; }
-  .profile-layout, .routine-layout, .favorites-layout, .form-layout {
-    height:auto;
-    flex:0 0 auto;
-    min-height:0;
-  }
-  .profile-intro, .list-panel, .schedule-panel, .hours-panel,
-  .favorites-panel, .games-panel, .cascade-panel, .form-panel,
-  .contact-aside { overflow:visible; }
-  .home-moment { height:130px; }
-  .home-moment img { height:100px; width:100%; object-fit:cover; }
-  .moments-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
-  .moments-grid .photo-card {
-    display:flex;
-    flex-direction:column;
-    height:144px;
-    min-height:144px;
-  }
-  .moments-grid .photo-card img {
-    display:block;
-    flex:0 0 112px;
-    width:100%;
-    height:112px;
-    min-height:0;
-    object-fit:cover;
-    object-position:center 35%;
-  }
-  .profile-main-photo { width:100%; height:180px; object-fit:cover; object-position:center 32%; }
-  .mini-photo { grid-template-columns:96px minmax(0,1fr); min-height:84px; }
-  .mini-photo img { width:96px; height:84px; object-fit:cover; }
-  .form-layout { grid-template-columns:1fr; }
-  .contact-aside {
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:0 16px;
-  }
-  .contact-aside>.eyebrow, .contact-aside h3,
-  .contact-aside>p, .privacy-note { grid-column:1/-1; }
-  .contact-link { padding:10px 0; }
-  .bottom-nav {
-    display:flex;
-    flex:0 0 67px;
-    justify-content:space-around;
-    align-items:center;
-    border-top:1px solid var(--line);
-    background:rgba(14,21,28,.97);
-    padding:5px 4px;
-    z-index:10;
-  }
-  .bottom-item {
-    border:0;
-    background:transparent;
-    color:#7c8e9a;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    gap:4px;
-    min-width:54px;
-    padding:4px 5px;
-  }
-  .bottom-item span { font-size:17px; line-height:1; }
-  .bottom-item small { font-size:8px; }
-  .bottom-item.active { color:var(--orange); }
-  .toast { right:20px; bottom:18px; }
-}
+
 
 
 /* Estado neutro mientras se verifica la conexión real al abrir la aplicación. */
@@ -1275,4 +1018,77 @@ button[data-hidratado="true"] { cursor:pointer; }
   max-width: 100%;
   max-height: 78vh;
   object-fit: contain;
+}
+
+
+/* C3-A2 · Escritorio real: navegación lateral y espacio amplio en computadora. */
+@media (min-width: 1025px) {
+  .app-shell {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    max-width: 1600px;
+    height: 100dvh;
+    min-height: 100dvh;
+    margin: 0 auto;
+    overflow: hidden;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .sidebar {
+    display: flex;
+    width: 238px;
+    flex: 0 0 238px;
+  }
+  .app-column {
+    position: relative;
+    width: auto;
+    height: 100%;
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+  .topbar {
+    height: 73px;
+    flex: 0 0 73px;
+    padding: 0 32px;
+  }
+  .mobile-brand { display: none; }
+  .breadcrumb { display: block; }
+  .mobile-menu-toggle { display: none; }
+  .main-content {
+    height: auto;
+    min-height: 0;
+    flex: 1 1 auto;
+    padding: 32px clamp(24px, 3vw, 42px) 18px;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+  .view { height: auto; min-height: 100%; overflow: visible; }
+  .view.active { height: auto; min-height: 100%; gap: 24px; overflow: visible; }
+  .profile-layout, .routine-layout, .favorites-layout, .form-layout {
+    height: auto;
+    min-height: 0;
+    flex: 0 0 auto;
+  }
+  .profile-intro, .list-panel, .schedule-panel, .hours-panel,
+  .favorites-panel, .games-panel, .cascade-panel, .form-panel,
+  .contact-aside { overflow: visible; }
+  .bottom-nav { display: none; }
+}
+
+/* C3-A2 · Accesibilidad táctil y teclado también en escritorio/tablet. */
+.nav-item, .mobile-menu button, .bottom-item,
+.primary-btn, .submit-btn, .theme-toggle {
+  min-height: 44px;
+}
+.form-field input, .form-field select, .form-field textarea,
+.select-grid select, .field-select {
+  min-height: 44px;
+}
+@media (max-width: 760px) {
+  .mobile-menu-toggle { width: 44px; min-width: 44px; height: 44px; }
+  .bottom-item { min-width: 54px; min-height: 44px; }
+  .theme-toggle { width: 44px; min-width: 44px; height: 44px; padding: 0; }
+  .theme-toggle__label { display: none; }
 }
