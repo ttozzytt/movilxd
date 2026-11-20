@@ -5,7 +5,7 @@
  */
 'use strict';
 
-const CACHE_OSCAR = 'oscar-movilxd-offline-first-v20-c3a2-saturday-cwv';
+const CACHE_OSCAR = 'oscar-movilxd-offline-first-v21-c3a2-entry-cwv';
 const RUTA_BASE_OSCAR = self.registration.scope;
 const JQUERY_OSCAR = 'https://code.jquery.com/jquery-3.6.0.min.js';
 const RECURSOS_OSCAR = [
