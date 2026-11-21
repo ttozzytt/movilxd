@@ -9,7 +9,7 @@
 <meta content="Conoce a Oscar Calle: estudiante de Ingeniería en Sistemas, fan del skate, el rap y los videojuegos." name="description"/>
 <title>Oscar Calle · Mi espacio</title>
 <link href="pwa.css?v=c3a2-games-gallery-20261121-r2" rel="stylesheet"/>
-<link href="theme.css?v=landscape-mobile-scroll-20261120-r1" rel="stylesheet"/>
+<link href="theme.css?v=food-gallery-20261121-r1" rel="stylesheet"/>
 <link href="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%23ff8b45%22/&gt;&lt;text x=%2250%25%22 y=%2265%25%22 font-size=%2250%22 text-anchor=%22middle%22 fill=%22%230d1820%22 font-family=%22Arial%22 font-weight=%22bold%22&gt;OC&lt;/text&gt;&lt;/svg&gt;" rel="icon"/>  <link rel="manifest" href="manifest.json">
 </head>
 <body>
@@ -377,11 +377,7 @@
 </div>
 <p class="empty-result" hidden="" id="gameEmpty">No hay juegos con ese nombre. Prueba con otro nombre.</p>
 </div>
-<div class="food-favorites">
-<div class="mini-heading">TAMBIÉN ME GUSTA</div>
-<div class="food-line"><span>🍲</span><div><small>COMIDA FAVORITA</small><strong>Falso conejo</strong></div></div>
-<div class="food-line"><span>🍓</span><div><small>FRUTAS FAVORITAS</small><strong>Frutilla · Palta · Mandarina</strong></div></div>
-</div>
+
 </article>
 </div>
 <article class="panel cascade-panel"><div class="panel-title"><span class="card-icon cyan">⌘</span><div><small>ACTIVIDAD INTERACTIVA</small><h3>Filtro de 3 capas</h3></div></div>
@@ -392,6 +388,24 @@
 <select class="field-select" disabled="" id="moduleSelect"><option value="">Primero elige un área</option></select>
 <div class="step-label"><span>3</span><span>Elemento filtrado</span></div>
 <div class="layer-result" id="layerResult"><span class="result-icon">✦</span><div><small>RESULTADO</small><strong>Esperando selección</strong><p>El resultado aparecerá aquí.</p></div></div>
+<section class="food-favorites" aria-labelledby="foodFavoritesTitle">
+<div class="food-favorites__heading">
+  <div><span class="mini-heading">MIS GUSTOS · COMIDA</span><h4 id="foodFavoritesTitle">Lo que me gusta comer</h4></div>
+  <span class="food-favorites__count">9 FAVORITOS</span>
+</div>
+<div class="food-grid" id="foodList" aria-label="Galería de comidas favoritas">
+  <article class="food-card"><div class="food-card__media"><span class="food-card__fallback" aria-hidden="true">SAL</span><img class="food-card__image" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2e/Salchipapa_Coste%C3%B1a.jpg/960px-Salchipapa_Coste%C3%B1a.jpg?utm_campaign=index&amp;utm_content=thumbnail&amp;utm_source=commons.wikimedia.org" width="960" height="720" loading="lazy" decoding="async" alt="Salchipapa costeña con papas fritas, salchicha y salsa"/></div><div class="food-card__body"><strong>Salchipapa</strong><small>Papas fritas, salchicha y salsas.</small></div></article>
+  <article class="food-card"><div class="food-card__media"><span class="food-card__fallback" aria-hidden="true">HAM</span><img class="food-card__image" src="https://tn.com.ar/resizer/v2/MACC74LAVZF6NALB5NNLMOVBMU.jpg?auth=5de89cdd48b78c5e1ecb0096a47346455911956f30306709a80941f750a51ef8" width="1200" height="800" loading="lazy" decoding="async" alt="Hamburguesa preparada con pan, carne y acompañamientos"/></div><div class="food-card__body"><strong>Hamburguesa</strong><small>Pan, carne, vegetales y aderezos.</small></div></article>
+  <article class="food-card"><div class="food-card__media"><span class="food-card__fallback" aria-hidden="true">FC</span><img class="food-card__image" src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Falso_conejo%2C_plato_tradicional_boliviano.jpg/960px-Falso_conejo%2C_plato_tradicional_boliviano.jpg?utm_campaign=index&amp;utm_content=thumbnail&amp;utm_source=commons.wikimedia.org" width="960" height="720" loading="lazy" decoding="async" alt="Plato tradicional boliviano de falso conejo con arroz y acompañamientos"/></div><div class="food-card__body"><strong>Falso conejo</strong><small>Plato boliviano con carne, ají y arroz.</small></div></article>
+  <article class="food-card"><div class="food-card__media"><span class="food-card__fallback" aria-hidden="true">MIL</span><img class="food-card__image" src="https://i.blogs.es/a7fcbf/milanesa/1200_900.jpg" width="1200" height="900" loading="lazy" decoding="async" alt="Milanesa dorada y empanizada servida como plato principal"/></div><div class="food-card__body"><strong>Milanesa</strong><small>Carne empanizada y dorada.</small></div></article>
+  <article class="food-card"><div class="food-card__media"><span class="food-card__fallback" aria-hidden="true">POL</span><img class="food-card__image" src="https://resizer.glanacion.com/resizer/v2/comida-popular-en-muchas-partes-del-mundo-ya-4WUWX6K5S5AYHDGR2PPJKDWHGU.jpg?auth=0e07d0ed172f32e949e41f880757132370b30cbe8c8c39e3d96ddcfb7c6b122f&amp;height=854&amp;quality=70&amp;smart=true&amp;width=1280" width="1280" height="854" loading="lazy" decoding="async" alt="Piezas de pollo frito con una cobertura dorada y crujiente"/></div><div class="food-card__body"><strong>Pollo frito</strong><small>Pollo sazonado y crujiente.</small></div></article>
+  <article class="food-card"><div class="food-card__media"><span class="food-card__fallback" aria-hidden="true">FRU</span><img class="food-card__image" src="https://snapcalorie-webflow-website.s3.us-east-2.amazonaws.com/media/food_pics_v2/medium/fruit_salad_with_yogurt_and_nuts.jpg" width="960" height="640" loading="lazy" decoding="async" alt="Ensalada de frutas frescas acompañada de yogurt y frutos secos"/></div><div class="food-card__body"><strong>Frutas con yogurt</strong><small>Frutas frescas con yogurt.</small></div></article>
+  <article class="food-card"><div class="food-card__media"><span class="food-card__fallback" aria-hidden="true">EMP</span><img class="food-card__image" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c0/Salte%C3%B1as_de_Bolivia.jpg/960px-Salte%C3%B1as_de_Bolivia.jpg?utm_campaign=index&amp;utm_content=thumbnail&amp;utm_source=commons.wikimedia.org" width="960" height="768" loading="lazy" decoding="async" alt="Empanadas bolivianas tipo salteña, horneadas y rellenas"/></div><div class="food-card__body"><strong>Empanadas</strong><small>Masa horneada con relleno.</small></div></article>
+  <article class="food-card"><div class="food-card__media"><span class="food-card__fallback" aria-hidden="true">CHOC</span><img class="food-card__image" src="https://www.krill.fr/media/catalog/product/cache/7db168f77a3167534cae1e7a02390ea5/6/3/630344-Pain-au-chocolat-pur-beurre-pac-00550494.jpg" width="1000" height="700" loading="lazy" decoding="async" alt="Pan de chocolate hojaldrado recién horneado"/></div><div class="food-card__body"><strong>Pan de chocolate</strong><small>Masa hojaldrada con chocolate.</small></div></article>
+  <article class="food-card"><div class="food-card__media"><span class="food-card__fallback" aria-hidden="true">PAL</span><img class="food-card__image" src="https://static.wixstatic.com/media/9755d8_f8d564422ff74098b54c3c187d99185a~mv2.webp/v1/fill/w_1000%2Ch_563%2Cal_c%2Cq_85%2Cusm_0.66_1.00_0.01/9755d8_f8d564422ff74098b54c3c187d99185a~mv2.webp" width="1000" height="563" loading="lazy" decoding="async" alt="Ensalada fresca preparada con palta y vegetales"/></div><div class="food-card__body"><strong>Ensalada con palta</strong><small>Vegetales frescos y palta.</small></div></article>
+</div>
+<small class="food-attribution">Créditos de imágenes: <a href="https://commons.wikimedia.org/wiki/File:Salchipapa_Coste%C3%B1a.jpg" target="_blank" rel="noopener noreferrer">PapiPijuan</a>, <a href="https://commons.wikimedia.org/wiki/File:Falso_conejo,_plato_tradicional_boliviano.jpg" target="_blank" rel="noopener noreferrer">Q'orikenti</a> y <a href="https://commons.wikimedia.org/wiki/File:Salte%C3%B1as_de_Bolivia.jpg" target="_blank" rel="noopener noreferrer">EEJCC</a> · <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener noreferrer">CC BY-SA 4.0</a>.</small>
+</section>
 <div class="cascade-foot"><span class="tiny-dot"></span> Filtro dinámico en cascada</div>
 </article>
 </div>
@@ -442,6 +456,6 @@
 <div aria-live="polite" class="toast" id="toast" role="status"></div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js" defer></script>
 <script src="./js/security-and-vitals.js" defer></script>
-<script src="pwa.js?v=games-image-fallback-20261121-r3" defer></script>
+<script src="pwa.js?v=food-gallery-20261121-r1" defer></script>
 </body>
 </html>
