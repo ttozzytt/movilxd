@@ -5,16 +5,26 @@
  */
 'use strict';
 
-const CACHE_OSCAR = 'oscar-movilxd-offline-first-v23-landscape-mobile-scroll';
+const CACHE_OSCAR = 'oscar-movilxd-offline-first-v24-games-gallery';
 const RUTA_BASE_OSCAR = self.registration.scope;
 const JQUERY_OSCAR = 'https://code.jquery.com/jquery-3.6.0.min.js';
+const ORIGENES_IMAGENES_JUEGOS_OSCAR = new Set([
+  'https://www.rocketleague.com',
+  'https://store-images.s-microsoft.com',
+  'https://www.vga4a.com',
+  'https://cdn.mos.cms.futurecdn.net',
+  'https://img.pccomponentes.com',
+  'https://www.strafe.com',
+  'https://staticg.sportskeeda.com',
+  'https://static.actugaming.net'
+]);
 const RECURSOS_OSCAR = [
   './',
   './index.html',
   './index.css',
   './index.js',
   './pwa.html',
-  './pwa.css?v=c3a2-gallery-youtube-20261121-r1',
+  './pwa.css?v=c3a2-games-gallery-20261121-r2',
   './pwa.js',
   './theme.css',
   './js/security-and-vitals.js',
@@ -101,7 +111,10 @@ self.addEventListener('fetch', event => {
   // Las fotos de la galería son locales y están precargadas en el app shell.
   const esMismoOrigen = url.origin === self.location.origin;
   const esJQuery = url.href === JQUERY_OSCAR;
-  if (!esMismoOrigen && !esJQuery) return;
+  const esImagenJuego = !esMismoOrigen
+    && solicitud.destination === 'image'
+    && ORIGENES_IMAGENES_JUEGOS_OSCAR.has(url.origin);
+  if (!esMismoOrigen && !esJQuery && !esImagenJuego) return;
 
   event.respondWith((async () => {
     const cache = await caches.open(CACHE_OSCAR);
