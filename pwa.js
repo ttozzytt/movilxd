@@ -461,6 +461,19 @@ function hidratarBusquedasOscar() {
     });
 
   $(document)
+    .off('input.oscarBusquedaCanciones', '#songSearch')
+    .on('input.oscarBusquedaCanciones', '#songSearch', function () {
+      const texto = this.value.trim().toLocaleLowerCase('es');
+      let visibles = 0;
+      $('#songList .song-list__link').each(function () {
+        const coincide = (this.dataset.search || '').toLocaleLowerCase('es').includes(texto);
+        this.hidden = !coincide;
+        if (coincide) visibles++;
+      });
+      $('#songEmpty').prop('hidden', visibles !== 0);
+    });
+
+  $(document)
     .off('input.oscarBusquedaJuegos', '#gameSearch')
     .on('input.oscarBusquedaJuegos', '#gameSearch', function () {
       const texto = this.value.trim().toLocaleLowerCase('es');
@@ -473,7 +486,6 @@ function hidratarBusquedasOscar() {
       $('#gameEmpty').prop('hidden', visibles !== 0);
     });
 }
-
 function hidratarSeleccionMusicalOscar() {
   $(document)
     .off('change.oscarGenero', '#genreSelect')
@@ -496,7 +508,7 @@ function hidratarSeleccionMusicalOscar() {
 const CLAVE_PREFERENCIAS_OSCAR = 'oscar-pwa-preferencias-v1';
 function hidratarPersistenciaLocalOscar() {
   const selectorCambios = '#areaSelect, #moduleSelect, #genreSelect, #artistSelect';
-  const selectorBusquedas = '#musicSearch, #gameSearch';
+  const selectorBusquedas = '#musicSearch, #gameSearch, #songSearch';
   const guardarPreferencias = () => {
     const estado = {
       area: $('#areaSelect').val() || '',
@@ -504,7 +516,8 @@ function hidratarPersistenciaLocalOscar() {
       genero: $('#genreSelect').val() || '',
       artista: $('#artistSelect').val() || '',
       busquedaMusica: $('#musicSearch').val() || '',
-      busquedaJuegos: $('#gameSearch').val() || ''
+      busquedaJuegos: $('#gameSearch').val() || '',
+      busquedaCanciones: $('#songSearch').val() || ''
     };
     try {
       localStorage.setItem(CLAVE_PREFERENCIAS_OSCAR, JSON.stringify(estado));
@@ -536,6 +549,7 @@ function hidratarPersistenciaLocalOscar() {
   }
   if (estado.busquedaMusica) $('#musicSearch').val(estado.busquedaMusica).trigger('input');
   if (estado.busquedaJuegos) $('#gameSearch').val(estado.busquedaJuegos).trigger('input');
+  if (estado.busquedaCanciones) $('#songSearch').val(estado.busquedaCanciones).trigger('input');
 }
 
 function hidratarValidacionesOscar() {
