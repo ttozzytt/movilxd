@@ -5,11 +5,12 @@
  */
 'use strict';
 
-const CACHE_OSCAR = 'oscar-movilxd-offline-first-v26-songs-favorites';
+const CACHE_OSCAR = 'oscar-movilxd-offline-first-v27-rocketleague-art';
 const RUTA_BASE_OSCAR = self.registration.scope;
 const JQUERY_OSCAR = 'https://code.jquery.com/jquery-3.6.0.min.js';
 const ORIGENES_IMAGENES_EXTERNAS_OSCAR = new Set([
   'https://www.rocketleague.com',
+  'https://cdn2.unrealengine.com',
   'https://store-images.s-microsoft.com',
   'https://www.vga4a.com',
   'https://cdn.mos.cms.futurecdn.net',
