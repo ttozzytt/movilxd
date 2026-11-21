@@ -98,7 +98,8 @@ self.addEventListener('fetch', event => {
   // Las pruebas de Internet V10 usan destinos externos. Este SW nunca los cachea ni los intercepta.
   // Las rutas locales con el parámetro de prueba también se dejan pasar directamente a la red.
   if (url.searchParams.has('__connection_check')) return;
-  // Las fotos de la galería son locales y están precargadas en el app shell.\n  const esMismoOrigen = url.origin === self.location.origin;
+  // Las fotos de la galería son locales y están precargadas en el app shell.
+  const esMismoOrigen = url.origin === self.location.origin;
   const esJQuery = url.href === JQUERY_OSCAR;
   if (!esMismoOrigen && !esJQuery) return;
 
