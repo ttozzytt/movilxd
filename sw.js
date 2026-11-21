@@ -5,10 +5,10 @@
  */
 'use strict';
 
-const CACHE_OSCAR = 'oscar-movilxd-offline-first-v24-games-gallery';
+const CACHE_OSCAR = 'oscar-movilxd-offline-first-v25-food-gallery';
 const RUTA_BASE_OSCAR = self.registration.scope;
 const JQUERY_OSCAR = 'https://code.jquery.com/jquery-3.6.0.min.js';
-const ORIGENES_IMAGENES_JUEGOS_OSCAR = new Set([
+const ORIGENES_IMAGENES_EXTERNAS_OSCAR = new Set([
   'https://www.rocketleague.com',
   'https://store-images.s-microsoft.com',
   'https://www.vga4a.com',
@@ -16,7 +16,15 @@ const ORIGENES_IMAGENES_JUEGOS_OSCAR = new Set([
   'https://img.pccomponentes.com',
   'https://www.strafe.com',
   'https://staticg.sportskeeda.com',
-  'https://static.actugaming.net'
+  'https://static.actugaming.net',
+  'https://thumb.wikimedia.org',
+  'https://upload.wikimedia.org',
+  'https://tn.com.ar',
+  'https://i.blogs.es',
+  'https://resizer.glanacion.com',
+  'https://snapcalorie-webflow-website.s3.us-east-2.amazonaws.com',
+  'https://www.krill.fr',
+  'https://static.wixstatic.com'
 ]);
 const RECURSOS_OSCAR = [
   './',
@@ -25,8 +33,8 @@ const RECURSOS_OSCAR = [
   './index.js',
   './pwa.html',
   './pwa.css?v=c3a2-games-gallery-20261121-r2',
-  './pwa.js',
-  './theme.css',
+  './pwa.js?v=food-gallery-20261121-r1',
+  './theme.css?v=food-gallery-20261121-r1',
   './js/security-and-vitals.js',
   './manifest.json',
   './icons/icon-192.png',
@@ -111,10 +119,10 @@ self.addEventListener('fetch', event => {
   // Las fotos de la galería son locales y están precargadas en el app shell.
   const esMismoOrigen = url.origin === self.location.origin;
   const esJQuery = url.href === JQUERY_OSCAR;
-  const esImagenJuego = !esMismoOrigen
+  const esImagenExterna = !esMismoOrigen
     && solicitud.destination === 'image'
-    && ORIGENES_IMAGENES_JUEGOS_OSCAR.has(url.origin);
-  if (!esMismoOrigen && !esJQuery && !esImagenJuego) return;
+    && ORIGENES_IMAGENES_EXTERNAS_OSCAR.has(url.origin);
+  if (!esMismoOrigen && !esJQuery && !esImagenExterna) return;
 
   event.respondWith((async () => {
     const cache = await caches.open(CACHE_OSCAR);
