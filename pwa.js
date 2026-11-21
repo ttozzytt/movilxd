@@ -176,6 +176,113 @@ async function guardarRegistroPendienteOscar(datos) {
   });
 }
 
+
+ // BASE DE DATOS REMOTA · Proyecto independiente oscar-personal.
+ // La clave publishable es pública por diseño; RLS limita su uso a INSERT.
+const SUPABASE_PERSONAL_URL_OSCAR = 'https://mjwuhcxwkingmkgofjjl.supabase.co';
+const SUPABASE_PERSONAL_KEY_OSCAR = 'sb_publishable_3q0TpNW92yFZZYKHlOm1Jw_ZKg_-3XT';
+
+function crearRequestIdOscar() {
+  if (window.crypto && typeof window.crypto.randomUUID === 'function') return window.crypto.randomUUID();
+  const bytes = new Uint8Array(16);
+  window.crypto.getRandomValues(bytes);
+  bytes[6] = (bytes[6] & 0x0f) | 0x40;
+  bytes[8] = (bytes[8] & 0x3f) | 0x80;
+  const hex = Array.from(bytes, byte => byte.toString(16).padStart(2, '0')).join('');
+  return hex.slice(0, 8) + '-' + hex.slice(8, 12) + '-' + hex.slice(12, 16) + '-' + hex.slice(16, 20) + '-' + hex.slice(20);
+}
+
+function prepararPayloadSupabaseOscar(datos) {
+  return {
+    request_id: datos.requestId,
+    nombre: datos.nombre,
+    correo: datos.correo,
+    celular: datos.celular,
+    fecha_nacimiento: datos.fechaNacimiento,
+    mensaje: datos.mensaje,
+    accepted_terms: datos.acceptedTerms === true
+  };
+}
+
+async function insertarRegistroSupabaseOscar(datos) {
+  const respuesta = await fetch(SUPABASE_PERSONAL_URL_OSCAR + '/rest/v1/personal_contact_submissions?on_conflict=request_id', {
+    method: 'POST',
+    mode: 'cors',
+    cache: 'no-store',
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': SUPABASE_PERSONAL_KEY_OSCAR,
+      'Prefer': 'resolution=ignore-duplicates,return=minimal'
+    },
+    body: JSON.stringify(prepararPayloadSupabaseOscar(datos))
+  });
+  if (!respuesta.ok) {
+    const detalle = await respuesta.text().catch(() => '');
+    const error = new Error('La base de datos rechazó el envío (' + respuesta.status + ').');
+    error.status = respuesta.status;
+    error.detalle = detalle;
+    throw error;
+  }
+  return true;
+}
+
+async function actualizarRegistroPendienteOscar(id, datos) {
+  const base = await abrirBaseDatosOscar();
+  return new Promise((resolve, reject) => {
+    const transaccion = base.transaction(ALMACEN_COLA_OSCAR, 'readwrite');
+    transaccion.objectStore(ALMACEN_COLA_OSCAR).put({ id, creadoEn: new Date().toISOString(), estado: 'pendiente', datos });
+    transaccion.oncomplete = () => { base.close(); resolve(); };
+    transaccion.onerror = () => { base.close(); reject(transaccion.error || new Error('No se pudo actualizar el registro pendiente.')); };
+  });
+}
+
+async function obtenerRegistrosPendientesOscar() {
+  const base = await abrirBaseDatosOscar();
+  return new Promise((resolve, reject) => {
+    const transaccion = base.transaction(ALMACEN_COLA_OSCAR, 'readonly');
+    const solicitud = transaccion.objectStore(ALMACEN_COLA_OSCAR).getAll();
+    solicitud.onsuccess = () => resolve((solicitud.result || []).filter(registro => registro.estado === 'pendiente'));
+    solicitud.onerror = () => reject(solicitud.error || new Error('No se pudo leer la cola local.'));
+    transaccion.oncomplete = () => base.close();
+    transaccion.onerror = () => { base.close(); reject(transaccion.error || new Error('Falló la lectura de la cola local.')); };
+  });
+}
+
+async function eliminarRegistroPendienteOscar(id) {
+  const base = await abrirBaseDatosOscar();
+  return new Promise((resolve, reject) => {
+    const transaccion = base.transaction(ALMACEN_COLA_OSCAR, 'readwrite');
+    transaccion.objectStore(ALMACEN_COLA_OSCAR).delete(id);
+    transaccion.oncomplete = () => { base.close(); resolve(); };
+    transaccion.onerror = () => { base.close(); reject(transaccion.error || new Error('No se pudo retirar el envío sincronizado.')); };
+    transaccion.onabort = () => { base.close(); reject(transaccion.error || new Error('Se canceló la actualización de la cola.')); };
+  });
+}
+
+let sincronizacionPrimerPlanoOscar = null;
+async function sincronizarPendientesSupabaseOscar() {
+  if (sincronizacionPrimerPlanoOscar) return sincronizacionPrimerPlanoOscar;
+  if (navigator.onLine === false) return 0;
+  sincronizacionPrimerPlanoOscar = (async () => {
+    const pendientes = await obtenerRegistrosPendientesOscar();
+    let enviados = 0;
+    for (const registro of pendientes) {
+      const datos = registro.datos || {};
+      if (!datos.requestId) {
+        datos.requestId = crearRequestIdOscar();
+        datos.acceptedTerms = true; // La cola solo se crea después de aceptar los términos.
+        await actualizarRegistroPendienteOscar(registro.id, datos);
+      }
+      await insertarRegistroSupabaseOscar(datos);
+      await eliminarRegistroPendienteOscar(registro.id);
+      enviados++;
+    }
+    return enviados;
+  })();
+  try { return await sincronizacionPrimerPlanoOscar; }
+  finally { sincronizacionPrimerPlanoOscar = null; }
+}
+
 async function contarRegistrosPendientesOscar() {
   const base = await abrirBaseDatosOscar();
   return new Promise((resolve, reject) => {
@@ -247,7 +354,9 @@ function actualizarEstadoRedOscar(enLinea, mostrarMensaje = false) {
   contarRegistrosPendientesOscar().then(cantidad => {
     if (cantidad > 0) {
       programarSincronizacionRegistrosOscar();
-      avisar(`Internet recuperado. Hay ${cantidad} registro(s) local(es) pendiente(s); falta configurar un servidor para enviarlos.`);
+      sincronizarPendientesSupabaseOscar().then(enviados => {
+        if (enviados > 0) avisar(`${enviados} registro(s) pendiente(s) enviados a la base de datos.`);
+      }).catch(error => console.warn('La cola local sigue pendiente:', error));
     } else {
       avisar('Conexión a Internet recuperada. La aplicación está en línea.');
     }
@@ -353,10 +462,17 @@ if (window.__OSCAR_PWA_CONNECTION_MONITOR__) {
     if (!estadoRedConfirmadoOscar) {
       mostrarAvisoOscar('Sin acceso a Internet. La página y sus recursos guardados siguen disponibles.');
     } else {
-      contarRegistrosPendientesOscar().then(cantidad => {
+      contarRegistrosPendientesOscar().then(async cantidad => {
         if (cantidad > 0) {
           programarSincronizacionRegistrosOscar();
-          mostrarAvisoOscar(`Internet recuperado. Hay ${cantidad} registro(s) local(es) pendiente(s); falta configurar un servidor para enviarlos.`);
+          try {
+            const enviados = await sincronizarPendientesSupabaseOscar();
+            if (enviados > 0) mostrarAvisoOscar(`${enviados} registro(s) pendiente(s) enviado(s) a la base de datos.`);
+            else mostrarAvisoOscar('Conexión recuperada. No quedan registros pendientes.');
+          } catch (error) {
+            console.warn('La cola aún no se pudo sincronizar:', error);
+            mostrarAvisoOscar('Internet recuperado, pero algunos registros siguen pendientes.');
+          }
         } else {
           mostrarAvisoOscar('Conexión a Internet recuperada. La aplicación está en línea.');
         }
@@ -579,7 +695,7 @@ function hidratarValidacionesOscar() {
 
   $(document)
     .off('submit.oscarFormulario', '#personalForm')
-    .on('submit.oscarFormulario', '#personalForm', function (event) {
+    .on('submit.oscarFormulario', '#personalForm', async function (event) {
       event.preventDefault();
       const campos = ['fullName', 'email', 'phone', 'birthDate', 'password', 'confirmPassword', 'message'];
       const resultados = campos.map(validarCampoOscar);
@@ -590,34 +706,61 @@ function hidratarValidacionesOscar() {
         $('#' + (indiceError !== -1 ? campos[indiceError] : 'terms')).trigger('focus');
         return;
       }
+
       const formulario = this;
-      // La cola conserva solo campos de contacto; jamás almacena contraseñas.
-      const registroLocal = {
+      // Solo se envían datos de contacto y aceptación; nunca la contraseña.
+      const registro = {
+        requestId: crearRequestIdOscar(),
         nombre: $('#fullName').val().trim(),
         correo: $('#email').val().trim(),
         celular: $('#phone').val().trim(),
         fechaNacimiento: $('#birthDate').val(),
-        mensaje: $('#message').val().trim()
+        mensaje: $('#message').val().trim(),
+        acceptedTerms: true
       };
-      $('#formStatus').text('Guardando el registro en este dispositivo…').attr('class', 'form-status');
-      guardarRegistroPendienteOscar(registroLocal).then(() => {
-        programarSincronizacionRegistrosOscar();
-        const mensaje = estadoRedConfirmadoOscar === true
-          ? 'Validación correcta. Registro guardado localmente y pendiente de envío: todavía no hay un servidor configurado. La contraseña no se almacenó.'
-          : 'Validación correcta. Registro guardado localmente y pendiente de envío al recuperar la conexión. La contraseña no se almacenó.';
-        $('#formStatus').text(mensaje).attr('class', 'form-status success');
+
+      $('#btnValidarFormulario').prop('disabled', true);
+      $('#formStatus').text('Enviando a la base de datos…').attr('class', 'form-status');
+
+      try {
+        if (estadoRedConfirmadoOscar === true) {
+          try {
+            await insertarRegistroSupabaseOscar(registro);
+            $('#formStatus').text('Registro guardado correctamente en la base de datos. La contraseña no se almacenó.').attr('class', 'form-status success');
+            mostrarAvisoOscar('Tu registro llegó a la base de datos.');
+            formulario.reset();
+            $('#charCount').text('0 / 200');
+            campos.concat(['terms']).forEach(idCampo => {
+              $('#' + idCampo).closest('.form-field').removeClass('invalid');
+              $('#err-' + idCampo).text('');
+            });
+            return;
+          } catch (error) {
+            if (error && Number.isInteger(error.status)) throw error;
+            console.warn('No se pudo confirmar el envío remoto; se guardará en la cola local:', error);
+          }
+        }
+
+        await guardarRegistroPendienteOscar(registro);
+        await programarSincronizacionRegistrosOscar();
+        $('#formStatus').text('Sin conexión confirmada. El registro quedó guardado temporalmente en este dispositivo y se enviará al recuperar Internet. La contraseña no se almacenó.').attr('class', 'form-status success');
+        mostrarAvisoOscar('Registro guardado temporalmente; pendiente de sincronización.');
         formulario.reset();
         $('#charCount').text('0 / 200');
         campos.concat(['terms']).forEach(idCampo => {
           $('#' + idCampo).closest('.form-field').removeClass('invalid');
           $('#err-' + idCampo).text('');
         });
-        mostrarAvisoOscar('Registro guardado localmente. Quedó en la cola pendiente.');
-      }).catch(error => {
-        console.error('No se pudo guardar el registro local:', error);
-        $('#formStatus').text('No se pudo guardar localmente. Tus datos siguen en el formulario; intenta nuevamente.').attr('class', 'form-status error');
-        mostrarAvisoOscar('No se pudo guardar el registro en este dispositivo.');
-      });
+      } catch (error) {
+        console.error('No se pudo registrar el envío:', error);
+        const texto = error && Number.isInteger(error.status)
+          ? 'El servidor rechazó el registro. Revisa los datos e inténtalo nuevamente.'
+          : 'No se pudo guardar el registro. Tus datos siguen en el formulario; inténtalo otra vez.';
+        $('#formStatus').text(texto).attr('class', 'form-status error');
+        mostrarAvisoOscar('No se pudo completar el envío.');
+      } finally {
+        $('#btnValidarFormulario').prop('disabled', false);
+      }
     });
 }
 
@@ -707,7 +850,17 @@ $(window)
       });
       console.info('Service Worker PWA registrado con éxito:', registro.scope);
       const cantidad = await contarRegistrosPendientesOscar().catch(() => 0);
-      if (cantidad > 0) programarSincronizacionRegistrosOscar();
+      if (cantidad > 0) {
+        programarSincronizacionRegistrosOscar();
+        if (navigator.onLine) {
+          try {
+            const enviados = await sincronizarPendientesSupabaseOscar();
+            if (enviados > 0) mostrarAvisoOscar(`${enviados} registro(s) pendiente(s) enviados a la base de datos.`);
+          } catch (error) {
+            console.warn('Registros locales pendientes de conexión:', error);
+          }
+        }
+      }
     } catch (error) {
       console.error('Fallo en el registro del Service Worker:', error);
     }
