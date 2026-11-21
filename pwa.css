@@ -585,7 +585,7 @@ body { overscroll-behavior:none; }
   grid-template-columns:repeat(2,minmax(0,1fr));
   gap:6px;
 }
-.song-list span {
+.song-list > span {
   display:grid;
   grid-template-columns:20px 1fr;
   align-items:center;
@@ -595,13 +595,13 @@ body { overscroll-behavior:none; }
   border-radius:8px;
   background:rgba(255,255,255,.025);
 }
-.song-list b {
+.song-list > span b {
   grid-row:span 2;
   color:var(--orange);
   font-size:8px;
 }
-.song-list strong { font-size:9px; }
-.song-list small { color:#8395a0; font-size:8px; margin-top:2px; }
+.song-list > span strong { font-size:9px; }
+.song-list > span small { color:#8395a0; font-size:8px; margin-top:2px; }
 
 .food-favorites {
   border-top:1px solid var(--line);
