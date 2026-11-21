@@ -28,7 +28,7 @@
       </div>
       <div class="entry-copy">
         <div class="entry-brand"><span class="entry-mark">OC</span><span>OSCAR CALLE</span>
-        <button class="theme-toggle entry-theme-toggle" id="entryThemeToggle" type="button" data-hidratado="false" disabled aria-label="Activar modo claro" title="Cambiar tema"><span class="theme-toggle__icon" aria-hidden="true">☀</span><span class="theme-toggle__label">Modo claro</span></button></div>
+        <button class="theme-toggle entry-theme-toggle" id="entryThemeToggle" type="button" data-hidratado="false" disabled aria-label="Activar modo claro" title="Cambiar tema"><span class="theme-toggle__icon" aria-hidden="true">☀</span><span class="theme-toggle__label">Modo claro</span></button><button class="contrast-toggle" id="contrastToggle" type="button" aria-pressed="false" title="Activar o desactivar alto contraste">◐ Contraste</button><script>(function(){const b=document.getElementById('contrastToggle');if(!b)return;const k='contrast-mode-v1';function set(v){document.documentElement.classList.toggle('contraste-activo',v);try{localStorage.setItem(k,v?'1':'0')}catch(_){}b.setAttribute('aria-pressed',String(v));b.textContent=v?'◐ Desactivar contraste':'◐ Contraste'}let on=false;try{on=localStorage.getItem(k)==='1'}catch(_){}set(on);b.addEventListener('click',()=>set(!document.documentElement.classList.contains('contraste-activo')));})();</script></div>
         <p class="eyebrow"><span class="eyebrow-line"></span> MI RINCÓN PERSONAL</p>
         <h1>Qué onda, soy <span>Oscar.</span></h1>
         <p class="entry-lead">Tengo 22 años, estudio Ingeniería en Sistemas y quiero llegar a crear videojuegos. Aquí comparto un poco de lo que soy y de lo que disfruto.</p>
