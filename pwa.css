@@ -1127,3 +1127,38 @@ button[data-hidratado="true"] { cursor:pointer; }
   .moments-grid .photo-card { height:105px; min-height:105px; }
   .moments-grid .photo-card img { height:75px; flex-basis:75px; }
 }
+
+/* C3-A2 · Música enlazada y reserva estable de imágenes de galería. */
+.song-list__link {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 9px 5px;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+  border-radius: 8px;
+  color: var(--text);
+  text-decoration: none;
+  transition: background-color .18s ease, color .18s ease;
+}
+.song-list__link:hover,
+.song-list__link:focus-visible {
+  color: var(--orange);
+  background: rgba(255,139,69,.07);
+}
+.song-list__link:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 2px;
+}
+.song-list__rank { color: #71838f; font-size: 9px; font-weight: 700; }
+.song-list__details { display: grid; min-width: 0; gap: 2px; }
+.song-list__title { overflow: hidden; color: inherit; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+.song-list__artist { overflow: hidden; color: #8495a0; font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
+.song-list__action { color: var(--orange); font-size: 8px; font-weight: 800; white-space: nowrap; }
+.top-songs__note { margin: 7px 0 0; color: #8798a3; font-size: 8px; line-height: 1.5; }
+.home-moment__image { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; object-position: center; }
+@media (max-width: 560px) {
+  .song-list__link { grid-template-columns: 19px minmax(0, 1fr) auto; gap: 7px; padding: 8px 3px; }
+  .song-list__action { font-size: 7px; }
+}
