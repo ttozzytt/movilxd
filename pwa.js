@@ -608,19 +608,19 @@ function hidratarValidacionesOscar() {
 }
 
 function hidratarFallbackImagenesJuegosOscar() {
-  if (window.__OSCAR_GAME_IMAGE_FALLBACK__) return;
+  if (window.__OSCAR_CATALOG_IMAGE_FALLBACK__) return;
 
-  // Las imágenes externas pueden cambiar o dejar de estar disponibles.
-  // Si alguna falla, se muestra una placa con las iniciales y se conserva el texto del juego.
+  // Si falla una imagen remota, la tarjeta conserva un rótulo visible y su descripción.
   document.addEventListener('error', function (event) {
     const imagen = event.target;
-    if (!(imagen instanceof HTMLImageElement) || !imagen.matches('#gameList .game-card__image')) return;
-    const contenedor = imagen.closest('.game-card__media');
+    if (!(imagen instanceof HTMLImageElement)
+      || !imagen.matches('#gameList .game-card__image, #foodList .food-card__image')) return;
+    const contenedor = imagen.closest('.game-card__media, .food-card__media');
     if (contenedor) contenedor.classList.add('is-broken');
     imagen.remove();
   }, true);
 
-  window.__OSCAR_GAME_IMAGE_FALLBACK__ = true;
+  window.__OSCAR_CATALOG_IMAGE_FALLBACK__ = true;
 }
 
 function marcarControlesHidratadosOscar() {
