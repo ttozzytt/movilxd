@@ -423,3 +423,72 @@
   .hero-art { height: 118px; }
   .bottom-nav { display: none; }
 }
+
+
+/* Favoritos · mosaico de comidas que aprovecha el espacio del panel lateral. */
+#view-favoritos .cascade-panel { justify-content: flex-start; }
+#view-favoritos .cascade-foot { margin-top: 8px; }
+#view-favoritos .food-favorites {
+  display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px;
+  margin-top: 9px; padding-top: 9px; border-top: 1px solid var(--line);
+}
+#view-favoritos .food-favorites__heading {
+  display: flex; align-items: end; justify-content: space-between; gap: 8px;
+}
+#view-favoritos .food-favorites__heading .mini-heading { margin: 0 0 3px; }
+#view-favoritos .food-favorites__heading h4 {
+  margin: 0; color: var(--text); font: 600 13px 'Segoe UI', system-ui, sans-serif;
+}
+#view-favoritos .food-favorites__count {
+  color: var(--muted); font-size: 7px; font-weight: 700; letter-spacing: .8px; white-space: nowrap;
+}
+#view-favoritos .food-grid {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; align-items: stretch;
+}
+#view-favoritos .food-card {
+  display: flex; flex-direction: column; min-width: 0; overflow: hidden;
+  border: 1px solid var(--line); border-radius: 8px;
+  background: rgba(255,255,255,.025); color: var(--text);
+}
+#view-favoritos .food-card__media {
+  position: relative; display: grid; width: 100%; aspect-ratio: 16 / 9;
+  overflow: hidden; place-items: center;
+  background: linear-gradient(135deg, #263b4a, #18232d 62%, #3c2c25);
+}
+#view-favoritos .food-card__image {
+  display: block; width: 100%; height: 100%; object-fit: cover; object-position: center;
+}
+#view-favoritos .food-card__fallback {
+  display: none; position: absolute; inset: 0; place-items: center;
+  color: #ffb178;
+  background: radial-gradient(circle at 50% 35%, rgba(255,139,69,.2), transparent 65%);
+  font: 800 clamp(11px, 1.5vw, 17px) 'Segoe UI', system-ui, sans-serif; letter-spacing: .5px;
+}
+#view-favoritos .food-card__media.is-broken .food-card__fallback { display: grid; }
+#view-favoritos .food-card__body {
+  display: grid; align-content: start; gap: 2px; min-width: 0; padding: 5px 6px 6px;
+}
+#view-favoritos .food-card__body strong {
+  display: block; font-size: 9px; line-height: 1.2; overflow-wrap: anywhere;
+}
+#view-favoritos .food-card__body small {
+  display: block; color: var(--muted); font-size: 7px; line-height: 1.25; overflow-wrap: anywhere;
+}
+#view-favoritos .food-attribution {
+  display: block; color: var(--muted); font-size: 7px; line-height: 1.45;
+}
+#view-favoritos .food-attribution a {
+  color: var(--cyan); text-decoration: underline; text-underline-offset: 2px;
+}
+:root[data-theme="light"] #view-favoritos .food-card {
+  background: #fff; border-color: var(--line); color: var(--text);
+}
+:root[data-theme="light"] #view-favoritos .food-card__body strong { color: var(--text); }
+:root[data-theme="light"] #view-favoritos .food-card__body small,
+:root[data-theme="light"] #view-favoritos .food-attribution { color: var(--muted); }
+@media (max-width: 390px) {
+  #view-favoritos .food-grid { gap: 5px; }
+  #view-favoritos .food-card__body { padding: 4px; }
+  #view-favoritos .food-card__body strong { font-size: 8px; }
+  #view-favoritos .food-card__body small { font-size: 6.5px; }
+}
