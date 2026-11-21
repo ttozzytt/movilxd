@@ -8,7 +8,7 @@
   <script>try{document.documentElement.dataset.theme=localStorage.getItem("oscar-pwa-theme-v1")==="light"?"light":"dark"}catch(_){document.documentElement.dataset.theme="dark"}</script>
 <meta content="Conoce a Oscar Calle: estudiante de Ingeniería en Sistemas, fan del skate, el rap y los videojuegos." name="description"/>
 <title>Oscar Calle · Mi espacio</title>
-<link href="pwa.css?v=c3a2-gallery-youtube-20261121-r1" rel="stylesheet"/>
+<link href="pwa.css?v=c3a2-games-gallery-20261121-r2" rel="stylesheet"/>
 <link href="theme.css?v=landscape-mobile-scroll-20261120-r1" rel="stylesheet"/>
 <link href="data:image/svg+xml,&lt;svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22&gt;&lt;rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%23ff8b45%22/&gt;&lt;text x=%2250%25%22 y=%2265%25%22 font-size=%2250%22 text-anchor=%22middle%22 fill=%22%230d1820%22 font-family=%22Arial%22 font-weight=%22bold%22&gt;OC&lt;/text&gt;&lt;/svg&gt;" rel="icon"/>  <link rel="manifest" href="manifest.json">
 </head>
@@ -338,11 +338,44 @@
 </article>
 <article class="panel games-panel"><div class="panel-title"><span class="card-icon orange">⌘</span><div><small>PARA DESPEJARME</small><h3>Videojuegos</h3></div></div>
 <label class="search-box"><span>⌕</span><input aria-label="Buscar videojuegos" id="gameSearch" placeholder="Buscar videojuego" type="search"/></label>
-<div class="game-grid" id="gameList">
-<div class="game-card" data-search="rocket league fútbol autos"><span class="game-emoji">🚗</span><strong>Rocket League</strong><small>Fútbol con autos</small></div>
-<div class="game-card" data-search="pes fútbol"><span class="game-emoji">⚽</span><strong>PES</strong><small>Fútbol</small></div>
-<div class="game-card" data-search="minecraft construcción supervivencia"><span class="game-emoji">▧</span><strong>Minecraft</strong><small>Construcción y supervivencia</small></div>
-<p class="empty-result" hidden="" id="gameEmpty">No hay juegos con ese nombre.</p>
+<div class="game-grid" id="gameList" aria-label="Catálogo de videojuegos favoritos">
+<div class="game-card" data-search="rocket league fútbol autos competitivo">
+<div class="game-card__media"><span class="game-card__fallback" aria-hidden="true">RL</span><img class="game-card__image" src="https://www.rocketleague.com/rr7/rl_evergreen-BuFUX3Ml.jpg" width="640" height="360" loading="lazy" decoding="async" alt="Arte oficial de Rocket League con autos jugando fútbol"/></div>
+<div class="game-card__body"><strong>Rocket League</strong><small>Fútbol con autos · Competitivo</small></div>
+</div>
+<div class="game-card" data-search="fc 26 ea sports fc fútbol fifa">
+<div class="game-card__media"><span class="game-card__fallback" aria-hidden="true">FC 26</span><img class="game-card__image" src="https://store-images.s-microsoft.com/image/apps.10782.14143997528953872.6dedfcb1-25c9-4700-a587-b5e8d2190c68.12c48214-554d-4f98-a995-c19b9101d1aa" width="640" height="360" loading="lazy" decoding="async" alt="Portada promocional de EA SPORTS FC 26"/></div>
+<div class="game-card__body"><strong>FC 26</strong><small>Fútbol · Clubes y temporadas</small></div>
+</div>
+<div class="game-card" data-search="efootball pes fútbol konami">
+<div class="game-card__media"><span class="game-card__fallback" aria-hidden="true">eF</span><img class="game-card__image" src="https://www.vga4a.com/wp-content/uploads/GwOflg6WkAMnuyT.jpg" width="640" height="360" loading="lazy" decoding="async" alt="Imagen promocional de eFootball con un jugador en la cancha"/></div>
+<div class="game-card__body"><strong>eFootball</strong><small>Fútbol · Simulación de Konami</small></div>
+</div>
+<div class="game-card" data-search="god of war gow kratos ragnarok acción">
+<div class="game-card__media"><span class="game-card__fallback" aria-hidden="true">GOW</span><img class="game-card__image" src="https://cdn.mos.cms.futurecdn.net/v2/t%3A0%2Cl%3A420%2Ccw%3A1080%2Cch%3A1080%2Cq%3A80%2Cw%3A1080/73rHs7ci2yNFb3HVJb5Xd5.jpg" width="640" height="360" loading="lazy" decoding="async" alt="Arte de God of War Ragnarök con Kratos y Atreus"/></div>
+<div class="game-card__body"><strong>God of War</strong><small>Acción · Mitología nórdica</small></div>
+</div>
+<div class="game-card" data-search="shadow of the colossus aventura gigantes playstation">
+<div class="game-card__media"><span class="game-card__fallback" aria-hidden="true">SOTC</span><img class="game-card__image" src="https://img.pccomponentes.com/articles/14/147021/812cpzftuel-ac-sl1500.jpg" width="640" height="360" loading="lazy" decoding="async" alt="Portada de Shadow of the Colossus con uno de sus gigantes"/></div>
+<div class="game-card__body"><strong>Shadow of the Colossus</strong><small>Aventura · Gigantes y exploración</small></div>
+</div>
+<div class="game-card" data-search="league of legends lol moba estrategia">
+<div class="game-card__media"><span class="game-card__fallback" aria-hidden="true">LoL</span><img class="game-card__image" src="https://www.strafe.com/esports-betting/strafe-news/wp-content/uploads/sites/29/league-of-legends-changes-2025.jpg" width="640" height="360" loading="lazy" decoding="async" alt="Arte promocional de League of Legends con campeones"/></div>
+<div class="game-card__body"><strong>League of Legends</strong><small>MOBA · Estrategia en equipo</small></div>
+</div>
+<div class="game-card" data-search="valorant shooter táctico riot fps">
+<div class="game-card__media"><span class="game-card__fallback" aria-hidden="true">VAL</span><img class="game-card__image" src="https://cdn.mos.cms.futurecdn.net/QotLyoh6LR4VT8KvE3tGze.jpg" width="640" height="360" loading="lazy" decoding="async" alt="Arte promocional de Valorant con sus agentes"/></div>
+<div class="game-card__body"><strong>Valorant</strong><small>Shooter táctico · Partidas por rondas</small></div>
+</div>
+<div class="game-card" data-search="gta v gta 5 grand theft auto mundo abierto rockstar">
+<div class="game-card__media"><span class="game-card__fallback" aria-hidden="true">GTA V</span><img class="game-card__image" src="https://staticg.sportskeeda.com/editor/2022/03/e4923-16464087382896-1920.jpg" width="640" height="360" loading="lazy" decoding="async" alt="Arte de Grand Theft Auto V con sus personajes principales"/></div>
+<div class="game-card__body"><strong>GTA V</strong><small>Mundo abierto · Historia y GTA Online</small></div>
+</div>
+<div class="game-card" data-search="minecraft construcción exploración supervivencia">
+<div class="game-card__media"><span class="game-card__fallback" aria-hidden="true">MC</span><img class="game-card__image" src="https://static.actugaming.net/media/2024/09/minecraft-key-art-ps5.webp" width="640" height="360" loading="lazy" decoding="async" alt="Arte de Minecraft con Steve, Alex y un mundo de bloques"/></div>
+<div class="game-card__body"><strong>Minecraft</strong><small>Construcción · Exploración y supervivencia</small></div>
+</div>
+<p class="empty-result" hidden="" id="gameEmpty">No hay juegos con ese nombre. Prueba con otro nombre.</p>
 </div>
 <div class="food-favorites">
 <div class="mini-heading">TAMBIÉN ME GUSTA</div>
@@ -409,6 +442,6 @@
 <div aria-live="polite" class="toast" id="toast" role="status"></div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js" defer></script>
 <script src="./js/security-and-vitals.js" defer></script>
-<script src="pwa.js?v=desktop-full-20261117-r2" defer></script>
+<script src="pwa.js?v=games-image-fallback-20261121-r3" defer></script>
 </body>
 </html>
