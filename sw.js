@@ -5,7 +5,7 @@
  */
 'use strict';
 
-const CACHE_OSCAR = 'oscar-movilxd-offline-first-v28-games-mobile-larger';
+const CACHE_OSCAR = 'oscar-movilxd-offline-first-v29-personal-database';
 const RUTA_BASE_OSCAR = self.registration.scope;
 const JQUERY_OSCAR = 'https://code.jquery.com/jquery-3.6.0.min.js';
 const ORIGENES_IMAGENES_EXTERNAS_OSCAR = new Set([
@@ -34,7 +34,7 @@ const RECURSOS_OSCAR = [
   './index.js',
   './pwa.html',
   './pwa.css?v=c3a2-games-gallery-20261121-r2',
-  './pwa.js?v=songs-favorites-20261121-r1',
+  './pwa.js?v=personal-database-20261121-r1',
   './theme.css?v=games-mobile-larger-20261121-r1',
   './js/security-and-vitals.js',
   './manifest.json',
@@ -50,9 +50,9 @@ const RECURSOS_OSCAR = [
   './imagenes/parque-skate.webp'
 ];
 
-// Déjalo vacío mientras no exista un servidor/API que reciba los formularios.
-// Ejemplo de configuración futura: './api/registros' (debe existir realmente).
-const ENDPOINT_SINCRONIZACION_OSCAR = '';
+// API real del proyecto Supabase independiente oscar-personal.
+const ENDPOINT_SINCRONIZACION_OSCAR = 'https://mjwuhcxwkingmkgofjjl.supabase.co/rest/v1/personal_contact_submissions?on_conflict=request_id';
+const CLAVE_PUBLICA_SUPABASE_OSCAR = 'sb_publishable_3q0TpNW92yFZZYKHlOm1Jw_ZKg_-3XT';
 const BASE_DATOS_OSCAR = 'oscar-pwa-datos-locales';
 const ALMACEN_COLA_OSCAR = 'cola-registros';
 const ETIQUETA_SYNC_OSCAR = 'oscar-registros-pendientes';
@@ -178,6 +178,18 @@ async function obtenerPendientesOscar() {
   });
 }
 
+async function actualizarPendienteOscar(id, datos) {
+  const base = await abrirBaseOscar();
+  return new Promise((resolve, reject) => {
+    const transaccion = base.transaction(ALMACEN_COLA_OSCAR, 'readwrite');
+    transaccion.objectStore(ALMACEN_COLA_OSCAR).put({
+      id, creadoEn: new Date().toISOString(), estado: 'pendiente', datos
+    });
+    transaccion.oncomplete = () => { base.close(); resolve(); };
+    transaccion.onerror = () => { base.close(); reject(transaccion.error); };
+  });
+}
+
 async function eliminarPendienteOscar(id) {
   const base = await abrirBaseOscar();
   return new Promise((resolve, reject) => {
@@ -197,21 +209,36 @@ async function sincronizarColaOscar() {
   const pendientes = await obtenerPendientesOscar();
   if (!pendientes.length) return;
 
-  // No se envían datos personales a servicios de prueba ni a destinos inventados.
-  // La cola se conserva y se informa al usuario hasta configurar su backend real.
-  if (!ENDPOINT_SINCRONIZACION_OSCAR) {
-    await avisarClientesOscar('OSCAR_SYNC_SIN_ENDPOINT', 'Los registros siguen guardados en este dispositivo. Falta configurar el servidor receptor.');
-    return;
-  }
-
+  // Idempotencia por request_id: un reintento no crea un segundo registro.
   for (const registro of pendientes) {
-    const respuesta = await fetch(new URL(ENDPOINT_SINCRONIZACION_OSCAR, RUTA_BASE_OSCAR), {
+    const datos = registro.datos || {};
+    if (!datos.requestId) {
+      datos.requestId = crypto.randomUUID();
+      datos.acceptedTerms = true;
+      await actualizarPendienteOscar(registro.id, datos);
+    }
+    const payload = {
+      request_id: datos.requestId,
+      nombre: datos.nombre,
+      correo: datos.correo,
+      celular: datos.celular,
+      fecha_nacimiento: datos.fechaNacimiento,
+      mensaje: datos.mensaje,
+      accepted_terms: datos.acceptedTerms === true
+    };
+    const respuesta = await fetch(ENDPOINT_SINCRONIZACION_OSCAR, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'same-origin',
-      body: JSON.stringify({ idLocal: registro.id, creadoEn: registro.creadoEn, ...registro.datos })
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': CLAVE_PUBLICA_SUPABASE_OSCAR,
+        'Prefer': 'resolution=ignore-duplicates,return=minimal'
+      },
+      body: JSON.stringify(payload)
     });
-    if (!respuesta.ok) throw new Error('El servidor rechazó el registro (' + respuesta.status + ').');
+    if (!respuesta.ok) {
+      const detalle = await respuesta.text().catch(() => '');
+      throw new Error('Supabase rechazó el registro (' + respuesta.status + '): ' + detalle);
+    }
     await eliminarPendienteOscar(registro.id);
   }
 
