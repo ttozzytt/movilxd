@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1,
+    "name": "Skate",
+    "category": "A",
+    "detail": "Fotografía y movimiento.",
+    "image": "../../../imagenes/parque-skate.webp"
+  },
+  {
+    "id": 2,
+    "name": "Caminatas",
+    "category": "B",
+    "detail": "Salidas y momentos al aire libre.",
+    "image": "../../../imagenes/fogata.webp"
+  },
+  {
+    "id": 3,
+    "name": "Atardeceres",
+    "category": "C",
+    "detail": "Paisajes y recuerdos.",
+    "image": "../../../imagenes/atardecer.webp"
+  },
+  {
+    "id": 4,
+    "name": "Detalles de skate",
+    "category": "A",
+    "detail": "Una de mis aficiones.",
+    "image": "../../../imagenes/skate-detalle.webp"
+  }
+]
