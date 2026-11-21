@@ -5,7 +5,7 @@
  */
 'use strict';
 
-const CACHE_OSCAR = 'oscar-movilxd-offline-first-v25-food-gallery';
+const CACHE_OSCAR = 'oscar-movilxd-offline-first-v26-songs-favorites';
 const RUTA_BASE_OSCAR = self.registration.scope;
 const JQUERY_OSCAR = 'https://code.jquery.com/jquery-3.6.0.min.js';
 const ORIGENES_IMAGENES_EXTERNAS_OSCAR = new Set([
@@ -33,7 +33,7 @@ const RECURSOS_OSCAR = [
   './index.js',
   './pwa.html',
   './pwa.css?v=c3a2-games-gallery-20261121-r2',
-  './pwa.js?v=food-gallery-20261121-r1',
+  './pwa.js?v=songs-favorites-20261121-r1',
   './theme.css?v=food-gallery-20261121-r1',
   './js/security-and-vitals.js',
   './manifest.json',
